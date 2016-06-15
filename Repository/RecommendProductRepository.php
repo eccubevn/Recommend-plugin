@@ -118,9 +118,9 @@ class RecommendProductRepository extends EntityRepository
     public function getMaxRank()
     {
         // 最大のランクを取得する.
-        $dql = "SELECT MAX(m.id) AS max_rank FROM Plugin\Recommend\Entity\RecommendProduct m";
-
-        $q = $this->getEntityManager()->createQuery($dql);
+        //change from MAX(m.id) to MAX(m.rank)
+        $sql = "SELECT MAX(m.rank) AS max_rank FROM Plugin\Recommend\Entity\RecommendProduct m";
+        $q = $this->getEntityManager()->createQuery($sql);
 
         return $q->getSingleScalarResult();
     }
