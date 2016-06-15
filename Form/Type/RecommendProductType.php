@@ -46,7 +46,7 @@ class RecommendProductType extends AbstractType
      * Build config type form
      *
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param array $options
      * @return type
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -76,7 +76,7 @@ class RecommendProductType extends AbstractType
                 )));
 
         $builder
-            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use($app) {
+            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($app) {
                 $form = $event->getForm();
                 $data = $form->getData();
 
@@ -88,7 +88,10 @@ class RecommendProductType extends AbstractType
                     $RecommendProduct = $app['eccube.plugin.recommend.repository.recommend_product']->findBy(array('Product' => $Product));
 
                     if ($RecommendProduct) {
-                        $form['comment']->addError(new FormError('既に商品が追加されています。'));
+                        //check existing Product, except itself
+                        if (($RecommendProduct[0]->getId() != $data['id'])) {
+                            $form['comment']->addError(new FormError('既に商品が追加されています。'));
+                        }
                     }
                 }
 
