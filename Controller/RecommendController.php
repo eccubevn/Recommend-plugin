@@ -56,10 +56,9 @@ class RecommendController extends AbstractController
      * おすすめ商品の新規作成
      * @param Application $app
      * @param Request     $request
-     * @param integer     $id
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function create(Application $app, Request $request, $id)
+    public function create(Application $app, Request $request)
     {
         $builder = $app['form.factory']->createBuilder('admin_recommend');
         $form = $builder->getForm();

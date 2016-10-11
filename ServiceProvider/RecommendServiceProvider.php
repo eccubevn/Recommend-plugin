@@ -52,18 +52,11 @@ class RecommendServiceProvider implements ServiceProviderInterface
 
         // おすすめ商品の一覧
         $app->match('/'.$app["config"]["admin_route"].'/recommend', '\Plugin\Recommend\Controller\RecommendController::index')
-            ->value('id', null)->assert('id', '\d+|')
             ->bind('admin_recommend_list');
 
         // おすすめ商品の新規先
         $app->match('/'.$app["config"]["admin_route"].'/recommend/new', '\Plugin\Recommend\Controller\RecommendController::create')
-            ->value('id', null)->assert('id', '\d+|')
             ->bind('admin_recommend_new');
-
-        // おすすめ商品の新規作成・編集確定
-        $app->match('/'.$app["config"]["admin_route"].'/recommend/commit', '\Plugin\Recommend\Controller\RecommendController::commit')
-        ->value('id', null)->assert('id', '\d+|')
-        ->bind('admin_recommend_commit');
 
         // おすすめ商品の編集
         $app->match('/'.$app["config"]["admin_route"].'/recommend/edit/{id}', '\Plugin\Recommend\Controller\RecommendController::edit')
@@ -83,13 +76,13 @@ class RecommendServiceProvider implements ServiceProviderInterface
         $app->post('/'.$app["config"]["admin_route"].'/recommend/search/product', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')
             ->bind('admin_recommend_search_product');
 
-        $app->match('/'.$app["config"]["admin_route"].'/recommend/search/product/page/{page_no}', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')->assert('page_no', '\d+')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend/search/product/page/{page_no}', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')
+            ->assert('page_no', '\d+')
             ->bind('admin_recommend_search_product_page');
 
         // ブロック
         $app->match('/block/recommend_product_block', '\Plugin\Recommend\Controller\Block\RecommendController::index')
             ->bind('block_recommend_product_block');
-
 
         // 型登録
         $app['form.types'] = $app->share($app->extend('form.types', function ($types) use ($app) {

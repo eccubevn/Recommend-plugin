@@ -70,7 +70,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                     newRanks[this.dataset.recommendId] = oldRanks[i];
                     i++;
                 });
-
+                // token
+                {#newRanks["{{ constant('Eccube\\Common\\Constant::TOKEN_NAME') }}"] = '{{ csrf_token("authenticate") }}';#}
                 $.ajax({
                     url: '{{ url('admin_recommend_rank_move') }}',
                     type: 'POST',
@@ -99,8 +100,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                             <table class="table table-striped">
                                 <thead>
                                 <tr class="table_header">
-                                    <th>Image</th>
-                                    <th>商品</th>
+                                    <th>商品画像</th>
+                                    <th>商品名</th>
                                     <th>コメント</th>
                                     <th></th>
                                 </tr>
