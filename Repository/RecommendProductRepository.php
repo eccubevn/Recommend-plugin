@@ -24,12 +24,15 @@
 
 namespace Plugin\Recommend\Repository;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Id\SequenceGenerator;
 use Eccube\Common\Constant;
 use Eccube\Entity\Master\Disp;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * RecommendProductRepository
@@ -39,27 +42,9 @@ use Eccube\Entity\Master\Disp;
  */
 class RecommendProductRepository extends EntityRepository
 {
-
     /**
-     * find list
-     * @return mixed
-     */
-    public function findList()
-    {
-
-        $qb = $this->createQueryBuilder('rp')
-            ->select('rp, p')
-            ->innerJoin('rp.Product', 'p');
-
-        $qb->addOrderBy('rp.rank', 'DESC');
-
-        return $qb->getQuery()->getResult(Query::HYDRATE_ARRAY);
-
-    }
-
-    /**
-     * find by rank up
-     * @param $rank
+     * Find by rank up
+     * @param integer $rank
      * @return mixed
      * @throws NotFoundHttpException
      */
@@ -71,22 +56,22 @@ class RecommendProductRepository extends EntityRepository
                 ->addOrderBy('rp.rank', 'ASC')
                 ->setMaxResults(1);
 
-            $product = $qb
+            $Product = $qb
                 ->getQuery()
                 ->setParameters(array(
                     'rank' => $rank,
                 ))
                 ->getSingleResult();
 
-            return $product;
+            return $Product;
         } catch (NoResultException $e) {
             throw new NotFoundHttpException();
         }
     }
 
     /**
-     * find by rank down
-     * @param $rank
+     * Find by rank down
+     * @param integer $rank
      * @return mixed
      * @throws NotFoundHttpException
      */
@@ -98,37 +83,38 @@ class RecommendProductRepository extends EntityRepository
                 ->addOrderBy('rp.rank', 'DESC')
                 ->setMaxResults(1);
 
-            $product = $qb
+            $Product = $qb
                 ->getQuery()
                 ->setParameters(array(
                     'rank' => $rank,
                 ))
                 ->getSingleResult();
 
-            return $product;
+            return $Product;
         } catch (NoResultException $e) {
             throw new NotFoundHttpException();
         }
     }
 
     /**
-     * get max rank
+     * Get max rank
      * @return mixed
      */
     public function getMaxRank()
     {
         // 最大のランクを取得する.
-        $dql = "SELECT MAX(m.id) AS max_rank FROM Plugin\Recommend\Entity\RecommendProduct m";
-
-        $q = $this->getEntityManager()->createQuery($dql);
+        $sql = "SELECT MAX(m.rank) AS max_rank FROM Plugin\Recommend\Entity\RecommendProduct m";
+        $q = $this->getEntityManager()->createQuery($sql);
 
         return $q->getSingleScalarResult();
     }
 
-
+    /**
+     * @param Disp $Disp
+     * @return array
+     */
     public function getRecommendProduct(Disp $Disp)
     {
-
         $query = $this->createQueryBuilder('rp')
             ->innerJoin('Eccube\Entity\Product', 'p', 'WITH', 'p.id = rp.Product')
             ->where('p.Status = :Disp')
@@ -137,7 +123,6 @@ class RecommendProductRepository extends EntityRepository
             ->getQuery();
 
         return $query->getResult();
-
     }
 
 }

@@ -96,12 +96,25 @@ var setModeAndSubmit = function(mode, keyname, keyid) {
                         <div class="form-group" style="display: block;">
                             {{ form_label(form.id) }}
                             <div class="col-sm-9 col-lg-10">
-                                <a id="showSearchProductModal" class="btn btn-default btn-block btn-sm" data-toggle="modal" data-target="#searchProductModal">商品の追加</a>
-                                <span id="product_name">
-                                    {% if Product is not null %}
+                                {% if Product is not null %}
+                                    <div id="product-image">
+                                        <a href="{{ url('admin_product_product_edit', { id : Product.id }) }}">
+                                            <img src="{{ app.config.image_save_urlpath }}/{{ Product.mainFileName|no_image_product }}" style="max-width: 200px;"/>
+                                        </a>
+                                    </div>
+                                    <br>
+                                    <span id="product-code">
+                                        {{ Product.code_min }}
+                                        {% if Product.code_min != Product.code_max %} ～ {{ Product.code_max }}
+                                        {% endif %}
+                                    </span>
+                                    <br>
+                                    <span id="product-name">
                                         {{ Product.name }}
-                                    {% endif %}
-                                </span>
+                                    </span>
+                                {% endif %}
+
+                                <a id="showSearchProductModal" class="btn btn-default btn-block btn-sm" data-toggle="modal" data-target="#searchProductModal">商品の追加</a>
                                 {{ form_widget(form.Product) }}
                                 {{ form_errors(form.Product) }}
                             </div>
@@ -117,7 +130,7 @@ var setModeAndSubmit = function(mode, keyname, keyid) {
                     </div>
                 </div><!-- /.box-body -->
             </div><!-- /.box -->
-            <div class="row hidden-xs hidden-sm">
+            <div class="row">
                 <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 text-center btn_area">
                     <button class="btn btn-primary btn-block btn-lg" onclick="return setModeAndSubmit('commit');">登録</button>
                     {% if form.id is not null %}

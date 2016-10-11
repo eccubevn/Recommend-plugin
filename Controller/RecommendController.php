@@ -26,39 +26,30 @@ namespace Plugin\Recommend\Controller;
 use Eccube\Application;
 use Eccube\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception as HttpException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Class RecommendController
+ * @package Plugin\Recommend\Controller
+ */
 class RecommendController extends AbstractController
 {
-
-    private $main_title;
-
-    private $sub_title;
-
-    public function __construct()
-    {
-    }
-
     /**
      * おすすめ商品一覧
      * @param Application $app
      * @param Request     $request
-     * @param unknown     $id
-     * @throws NotFoundHttpException
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function index(Application $app, Request $request)
     {
         $pagination = null;
 
-        $pagination = $app['eccube.plugin.recommend.repository.recommend_product']->findList();
+        $pagination = $app['eccube.plugin.recommend.repository.recommend_product']->findBy(array(), array('rank' => 'DESC'));
 
         return $app->render('Recommend/Resource/template/admin/index.twig', array(
             'pagination' => $pagination,
-            'totalItemCount' => count($pagination)
+            'total_item_count' => count($pagination),
         ));
     }
 
@@ -66,8 +57,7 @@ class RecommendController extends AbstractController
      * おすすめ商品の新規作成
      * @param Application $app
      * @param Request     $request
-     * @param unknown     $id
-     * @throws NotFoundHttpException
+     * @param integer     $id
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function create(Application $app, Request $request, $id)
@@ -76,35 +66,33 @@ class RecommendController extends AbstractController
         $builder = $app['form.factory']->createBuilder('admin_recommend');
         $form = $builder->getForm();
 
-        $service = $app['eccube.plugin.recommend.service.recommend'];
-
         $Product = null;
-
         if ('POST' === $request->getMethod()) {
             $form->handleRequest($request);
             $data = $form->getData();
             if ($form->isValid()) {
+                $service = $app['eccube.plugin.recommend.service.recommend'];
                 $status = $service->createRecommend($data);
 
                 if (!$status) {
-                    $app->addError('admin.recommend.notfound', 'admin');
+                    $app->addError('admin.recommend.not_found', 'admin');
                 } else {
-                    $app->addSuccess('admin.plugin.recommend.regist.success', 'admin');
+                    $app->addSuccess('admin.plugin.recommend.register.success', 'admin');
                 }
 
                 return $app->redirect($app->url('admin_recommend_list'));
             }
 
-            if (!is_null($data['Product'])) {
+            if (!empty($data['Product'])) {
                 $Product = $data['Product'];
             }
         }
 
-        return $this->renderRegistView(
+        return $this->registerView(
             $app,
             array(
                 'form' => $form->createView(),
-                'Product' => $Product
+                'Product' => $Product,
             )
         );
     }
@@ -113,28 +101,25 @@ class RecommendController extends AbstractController
      * 編集
      * @param Application $app
      * @param Request     $request
-     * @param unknown     $id
+     * @param integer     $id
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function edit(Application $app, Request $request, $id)
     {
+        if (!$id) {
+            $app->addError('admin.recommend.recommend_id.not_exists', 'admin');
 
-        if (is_null($id) || strlen($id) == 0) {
-            $app->addError("admin.recommend.recommend_id.notexists", "admin");
             return $app->redirect($app->url('admin_recommend_list'));
         }
-
-        $service = $app['eccube.plugin.recommend.service.recommend'];
 
         // IDからおすすめ商品情報を取得する
-        $Recommend = $app['eccube.plugin.recommend.repository.recommend_product']->findById($id);
+        $Recommend = $app['eccube.plugin.recommend.repository.recommend_product']->find($id);
 
-        if (is_null($Recommend)) {
-            $app->addError('admin.recommend.notfound', 'admin');
+        if (!$Recommend) {
+            $app->addError('admin.recommend.not_found', 'admin');
+
             return $app->redirect($app->url('admin_recommend_list'));
         }
-
-        $Recommend = $Recommend[0];
 
         // formの作成
         $form = $app['form.factory']
@@ -144,10 +129,11 @@ class RecommendController extends AbstractController
         if ('POST' === $request->getMethod()) {
             $form->handleRequest($request);
             if ($form->isValid()) {
+                $service = $app['eccube.plugin.recommend.service.recommend'];
                 $status = $service->updateRecommend($form->getData());
 
                 if (!$status) {
-                    $app->addError('admin.recommend.notfound', 'admin');
+                    $app->addError('admin.recommend.not_found', 'admin');
                 } else {
                     $app->addSuccess('admin.plugin.recommend.update.success', 'admin');
                 }
@@ -156,11 +142,11 @@ class RecommendController extends AbstractController
             }
         }
 
-        return $this->renderRegistView(
+        return $this->registerView(
             $app,
             array(
                 'form' => $form->createView(),
-                'Product' => $Recommend->getProduct()
+                'Product' => $Recommend->getProduct(),
             )
         );
     }
@@ -169,23 +155,26 @@ class RecommendController extends AbstractController
      * おすすめ商品の削除
      * @param Application $app
      * @param Request     $request
-     * @param unknown     $id
-     * @throws NotFoundHttpException
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param integer     $id
+     * @throws BadRequestHttpException
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function delete(Application $app, Request $request, $id)
     {
-
+        // Valid token
         $this->isTokenValid($app);
 
+        // Check request
         if (!'POST' === $request->getMethod()) {
-            throw new HttpException();
-        }
-        if (is_null($id) || strlen($id) == 0) {
-            $app->addError("admin.recommend.recommend_id.notexists", "admin");
-            return $app->redirect($app->url('admin_recommend_list'));
+            throw new BadRequestHttpException();
         }
 
+        // Id valid
+        if (!$id) {
+            $app->addError('admin.recommend.recommend_id.not_exists', 'admin');
+
+            return $app->redirect($app->url('admin_recommend_list'));
+        }
 
         $service = $app['eccube.plugin.recommend.service.recommend'];
 
@@ -193,40 +182,41 @@ class RecommendController extends AbstractController
         if ($service->deleteRecommend($id)) {
             $app->addSuccess('admin.plugin.recommend.delete.success', 'admin');
         } else {
-            $app->addError('admin.recommend.notfound', 'admin');
+            $app->addError('admin.recommend.not_found', 'admin');
         }
 
         return $app->redirect($app->url('admin_recommend_list'));
-
     }
 
     /**
      * 上へ
      * @param Application $app
      * @param Request     $request
-     * @param unknown     $id
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param integer     $id
+     * @deprecated It will be removed before release.
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function rankUp(Application $app, Request $request, $id)
     {
-
+        // Valid token
         $this->isTokenValid($app);
 
-        if (is_null($id) || strlen($id) == 0) {
-            $app->addError("admin.recommend.recommend_id.notexists", "admin");
+        if (!$id) {
+            $app->addError('admin.recommend.recommend_id.not_exists', 'admin');
+
             return $app->redirect($app->url('admin_recommend_list'));
         }
 
-        $service = $app['eccube.plugin.recommend.service.recommend'];
-
         // IDからおすすめ商品情報を取得する
         $Recommend = $app['eccube.plugin.recommend.repository.recommend_product']->find($id);
-        if (is_null($Recommend)) {
-            $app->addError('admin.recommend.notfound', 'admin');
+        if (!$Recommend) {
+            $app->addError('admin.recommend.not_found', 'admin');
+
             return $app->redirect($app->url('admin_recommend_list'));
         }
 
         // ランクアップ
+        $service = $app['eccube.plugin.recommend.service.recommend'];
         $service->rankUp($id);
 
         $app->addSuccess('admin.plugin.recommend.complete.up', 'admin');
@@ -238,29 +228,31 @@ class RecommendController extends AbstractController
      * 下へ
      * @param Application $app
      * @param Request     $request
-     * @param unknown     $id
+     * @param integer     $id
+     * @deprecated It will be removed before release.
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function rankDown(Application $app, Request $request, $id)
     {
-
         $this->isTokenValid($app);
 
-        if (is_null($id) || strlen($id) == 0) {
-            $app->addError("admin.recommend.recommend_id.notexists", "admin");
+        if (!$id) {
+            $app->addError('admin.recommend.recommend_id.not_exists', 'admin');
+
             return $app->redirect($app->url('admin_recommend_list'));
         }
 
-        $service = $app['eccube.plugin.recommend.service.recommend'];
 
         // IDからおすすめ商品情報を取得する
         $Recommend = $app['eccube.plugin.recommend.repository.recommend_product']->find($id);
-        if (is_null($Recommend)) {
-            $app->addError('admin.recommend.notfound', 'admin');
+        if (!$Recommend) {
+            $app->addError('admin.recommend.not_found', 'admin');
+
             return $app->redirect($app->url('admin_recommend_list'));
         }
 
         // ランクアップ
+        $service = $app['eccube.plugin.recommend.service.recommend'];
         $service->rankDown($id);
 
         $app->addSuccess('admin.plugin.recommend.complete.down', 'admin');
@@ -270,10 +262,11 @@ class RecommendController extends AbstractController
 
     /**
      * 編集画面用のrender
-     * @param unknown $app
-     * @param unknown $parameters
+     * @param Application $app
+     * @param array $parameters
+     * @return Response
      */
-    protected function renderRegistView($app, $parameters = array())
+    protected function registerView($app, $parameters = array())
     {
         // 商品検索フォーム
         $searchProductModalForm = $app['form.factory']->createBuilder('admin_search_product')->getForm();
@@ -281,7 +274,7 @@ class RecommendController extends AbstractController
             'searchProductModalForm' => $searchProductModalForm->createView(),
         );
         $viewParameters += $parameters;
+
         return $app->render('Recommend/Resource/template/admin/regist.twig', $viewParameters);
     }
-
 }

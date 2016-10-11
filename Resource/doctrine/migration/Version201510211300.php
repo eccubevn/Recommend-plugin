@@ -25,19 +25,24 @@ namespace DoctrineMigrations;
 
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\Tools\SchemaTool;
+use Eccube\Application;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Class Version201510211300
+ * @package DoctrineMigrations
  */
 class Version201510211300 extends AbstractMigration
 {
-
+    /**
+     * @var string table name
+     */
+    const NAME = 'plg_recommend_product';
     /**
      * @param Schema $schema
      */
     public function up(Schema $schema)
     {
-        // this up() migration is auto-generated, please modify it to your needs
         $this->createRecommendProduct($schema);
     }
 
@@ -47,54 +52,28 @@ class Version201510211300 extends AbstractMigration
     public function down(Schema $schema)
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $schema->dropTable('plg_recommend_product');
+        $schema->dropTable(self::NAME);
         $schema->dropSequence('plg_recommend_product_recommend_product_id_seq');
     }
 
     /**
-     * おすすめ商品テーブル作成
      * @param Schema $schema
+     * @return bool
      */
     protected function createRecommendProduct(Schema $schema)
     {
-        $table = $schema->createTable("plg_recommend_product");
-        $table->addColumn('recommend_product_id', 'integer', array(
-            'autoincrement' => true,
-            'notnull' => true,
-        ));
+        if ($schema->hasTable(self::NAME)) {
+            return true;
+        }
 
-        $table->addColumn('product_id', 'integer', array(
-            'notnull' => true,
-            'unsigned' => false,
-        ));
+        $app = Application::getInstance();
+        $em = $app['orm.em'];
+        $classes = array(
+            $em->getClassMetadata('Plugin\Recommend\Entity\RecommendProduct'),
+        );
+        $tool = new SchemaTool($em);
+        $tool->createSchema($classes);
 
-        $table->addColumn('comment', 'text', array(
-            'notnull' => false,
-        ));
-
-        $table->addColumn('rank', 'integer', array(
-            'notnull' => true,
-            'unsigned' => false,
-            'default' => 1,
-        ));
-
-        $table->addColumn('del_flg', 'smallint', array(
-            'notnull' => true,
-            'unsigned' => false,
-            'default' => 0,
-        ));
-
-        $table->addColumn('create_date', 'datetime', array(
-            'notnull' => true,
-            'unsigned' => false,
-        ));
-
-        $table->addColumn('update_date', 'datetime', array(
-            'notnull' => true,
-            'unsigned' => false,
-        ));
-
-        $table->setPrimaryKey(array('recommend_product_id'));
+        return true;
     }
-
 }

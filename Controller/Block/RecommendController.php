@@ -23,21 +23,32 @@
 
 namespace Plugin\Recommend\Controller\Block;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Eccube\Application;
 use Eccube\Entity\Master\Disp;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class RecommendController
+ * @package Plugin\Recommend\Controller\Block
+ */
 class RecommendController
 {
     /**
      * @param Application $app
+     * @return Response
      */
     public function index(Application $app)
     {
         $Disp = $app['eccube.repository.master.disp']->find(Disp::DISPLAY_SHOW);
-        $RecommendProducts = $app['eccube.plugin.recommend.repository.recommend_product']->getRecommendProduct($Disp);
 
-        return $app['view']->render('Block/recommend_product_block.twig', array(
-            'RecommendProducts' => $RecommendProducts,
+        /**
+         * @var ArrayCollection
+         */
+        $arrRecommendProduct = $app['eccube.plugin.recommend.repository.recommend_product']->getRecommendProduct($Disp);
+
+        return $app->render('Block/recommend_product_block.twig', array(
+            'recommend_products' => $arrRecommendProduct,
         ));
     }
 }

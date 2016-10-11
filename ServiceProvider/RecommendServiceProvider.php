@@ -23,13 +23,26 @@
 
 namespace Plugin\Recommend\ServiceProvider;
 
+use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
+use Monolog\Handler\FingersCrossedHandler;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Logger;
+use Plugin\Recommend\Form\Type\RecommendProductType;
+use Plugin\Recommend\Service\RecommendService;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
+use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Class RecommendServiceProvider
+ * @package Plugin\Recommend\ServiceProvider
+ */
 class RecommendServiceProvider implements ServiceProviderInterface
 {
-
+    /**
+     * @param BaseApplication $app
+     */
     public function register(BaseApplication $app)
     {
         // おすすめ情報テーブルリポジトリ
@@ -38,42 +51,42 @@ class RecommendServiceProvider implements ServiceProviderInterface
         });
 
         // おすすめ商品の一覧
-        $app->match('/' . $app["config"]["admin_route"] . '/recommend', '\Plugin\Recommend\Controller\RecommendController::index')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend', '\Plugin\Recommend\Controller\RecommendController::index')
             ->value('id', null)->assert('id', '\d+|')
             ->bind('admin_recommend_list');
 
         // おすすめ商品の新規先
-        $app->match('/' . $app["config"]["admin_route"] . '/recommend/new', '\Plugin\Recommend\Controller\RecommendController::create')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend/new', '\Plugin\Recommend\Controller\RecommendController::create')
             ->value('id', null)->assert('id', '\d+|')
             ->bind('admin_recommend_new');
 
         // おすすめ商品の新規作成・編集確定
-        $app->match('/' . $app["config"]["admin_route"] . '/recommend/commit', '\Plugin\Recommend\Controller\RecommendController::commit')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend/commit', '\Plugin\Recommend\Controller\RecommendController::commit')
         ->value('id', null)->assert('id', '\d+|')
         ->bind('admin_recommend_commit');
 
         // おすすめ商品の編集
-        $app->match('/' . $app["config"]["admin_route"] . '/recommend/edit/{id}', '\Plugin\Recommend\Controller\RecommendController::edit')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend/edit/{id}', '\Plugin\Recommend\Controller\RecommendController::edit')
             ->value('id', null)->assert('id', '\d+|')
             ->bind('admin_recommend_edit');
 
         // おすすめ商品の削除
-        $app->match('/' . $app["config"]["admin_route"] . '/recommend/delete/{id}', '\Plugin\Recommend\Controller\RecommendController::delete')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend/delete/{id}', '\Plugin\Recommend\Controller\RecommendController::delete')
         ->value('id', null)->assert('id', '\d+|')
         ->bind('admin_recommend_delete');
 
         // おすすめ商品のランク移動（上）
-        $app->match('/' . $app["config"]["admin_route"] . '/recommend/rank_up/{id}', '\Plugin\Recommend\Controller\RecommendController::rankUp')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend/rank_up/{id}', '\Plugin\Recommend\Controller\RecommendController::rankUp')
             ->value('id', null)->assert('id', '\d+|')
             ->bind('admin_recommend_rank_up');
 
         // おすすめ商品のランク移動（下）
-        $app->match('/' . $app["config"]["admin_route"] . '/recommend/rank_down/{id}', '\Plugin\Recommend\Controller\RecommendController::rankDown')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend/rank_down/{id}', '\Plugin\Recommend\Controller\RecommendController::rankDown')
             ->value('id', null)->assert('id', '\d+|')
             ->bind('admin_recommend_rank_down');
 
         // 商品検索画面表示
-        $app->post('/' . $app["config"]["admin_route"] . '/recommend/search/product', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')
+        $app->post('/'.$app["config"]["admin_route"].'/recommend/search/product', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')
             ->bind('admin_recommend_search_product');
 
         $app->match('/' . $app["config"]["admin_route"] . '/recommend/search/product/page/{page_no}', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')->assert('page_no', '\d+')
@@ -86,20 +99,21 @@ class RecommendServiceProvider implements ServiceProviderInterface
 
         // 型登録
         $app['form.types'] = $app->share($app->extend('form.types', function ($types) use ($app) {
-            $types[] = new \Plugin\Recommend\Form\Type\RecommendProductType($app);
+            $types[] = new RecommendProductType($app);
+
             return $types;
         }));
 
         // サービスの登録
         $app['eccube.plugin.recommend.service.recommend'] = $app->share(function () use ($app) {
-            return new \Plugin\Recommend\Service\RecommendService($app);
+            return new RecommendService($app);
         });
 
         // メッセージ登録
         $app['translator'] = $app->share($app->extend('translator', function ($translator, \Silex\Application $app) {
-            $translator->addLoader('yaml', new \Symfony\Component\Translation\Loader\YamlFileLoader());
+            $translator->addLoader('yaml', new YamlFileLoader());
 
-            $file = __DIR__ . '/../Resource/locale/message.' . $app['locale'] . '.yml';
+            $file = __DIR__.'/../Resource/locale/message.'.$app['locale'].'.yml';
             if (file_exists($file)) {
                 $translator->addResource('yaml', $file, $app['locale']);
             }
@@ -109,6 +123,7 @@ class RecommendServiceProvider implements ServiceProviderInterface
 
         // メニュー登録
         $app['config'] = $app->share($app->extend('config', function ($config) {
+            // menu bar
             $addNavi['id'] = 'admin_recommend';
             $addNavi['name'] = 'おすすめ管理';
             $addNavi['url'] = 'admin_recommend_list';
@@ -119,10 +134,47 @@ class RecommendServiceProvider implements ServiceProviderInterface
                 }
             }
             $config['nav'] = $nav;
+
+            // Update constants
+            $constantFile = __DIR__.'/../Resource/config/constant.yml';
+            if (file_exists($constantFile)) {
+                $constant = Yaml::parse(file_get_contents($constantFile));
+                if (!empty($constant)) {
+                    // Replace constants
+                    $config = array_replace_recursive($config, $constant);
+                }
+            }
+
             return $config;
         }));
+
+        // ログファイル設定
+        $app['monolog.Recommend'] = $app->share(function ($app) {
+            $loggerClass = $app['monolog.logger.class'];
+            $loggerName = 'plugin.Recommend';
+            $logger = new $loggerClass($loggerName);
+
+            $file = $app['config']['root_dir'].'/app/log/Recommend.log';
+            $rotateHandler = new RotatingFileHandler($file, $app['config']['log']['max_files'], Logger::INFO);
+            $rotateHandler->setFilenameFormat(
+                'Recommend_{date}',
+                'Y-m-d'
+            );
+
+            $logger->pushHandler(
+                new FingersCrossedHandler(
+                    $rotateHandler,
+                    new ErrorLevelActivationStrategy(Logger::INFO)
+                )
+            );
+
+            return $logger;
+        });
     }
 
+    /**
+     * @param BaseApplication $app
+     */
     public function boot(BaseApplication $app)
     {
     }

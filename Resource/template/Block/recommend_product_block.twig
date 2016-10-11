@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 <!-- ▼item_list▼ -->
 <div id="item_list">
     <div class="row">
-        {% for RecommendProduct in RecommendProducts %}
+        {% for RecommendProduct in recommend_products %}
             <div class="col-sm-3 col-xs-6">
                 <div class="pickup_item">
                     <a href="{{ url('product_detail', {'id': RecommendProduct.Product.id}) }}">

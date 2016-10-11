@@ -38,7 +38,7 @@ class RecommendService
      * コンストラクタ
      * @param Application $app
      */
-    public function __construct(Application $app)
+    public function __construct(\Silex\Application $app)
     {
         $this->app = $app;
         $this->BaseInfo = $app['eccube.repository.base_info']->get();
