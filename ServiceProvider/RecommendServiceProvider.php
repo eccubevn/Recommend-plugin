@@ -32,6 +32,7 @@ use Plugin\Recommend\Service\RecommendService;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class RecommendServiceProvider
@@ -119,6 +120,7 @@ class RecommendServiceProvider implements ServiceProviderInterface
 
         // メニュー登録
         $app['config'] = $app->share($app->extend('config', function ($config) {
+            // menu bar
             $addNavi['id'] = 'admin_recommend';
             $addNavi['name'] = 'おすすめ管理';
             $addNavi['url'] = 'admin_recommend_list';
@@ -129,6 +131,16 @@ class RecommendServiceProvider implements ServiceProviderInterface
                 }
             }
             $config['nav'] = $nav;
+
+            // Update constants
+            $constantFile = __DIR__.'/../Resource/config/constant.yml';
+            if (file_exists($constantFile)) {
+                $constant = Yaml::parse(file_get_contents($constantFile));
+                if (!empty($constant)) {
+                    // Replace constants
+                    $config = array_replace_recursive($config, $constant);
+                }
+            }
 
             return $config;
         }));

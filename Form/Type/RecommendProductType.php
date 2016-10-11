@@ -75,7 +75,11 @@ class RecommendProductType extends AbstractType
                 'trim' => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
+                    new Assert\Length(array(
+                        'max' => $app['config']['text_area_len'],
+                    )),
                 ),
+                'attr' => array('maxlength' => $app['config']['text_area_len']),
             ));
 
         $builder->add(
@@ -102,9 +106,9 @@ class RecommendProductType extends AbstractType
                 return;
             }
 
-            // Check existing Product, except itself
+            // Check existing Product in recommend, except itself
             if ($RecommendProduct->getId() != $data['id']) {
-                $form['comment']->addError(new FormError($app->trans('plugin.recommend.type.product_recommend.not_found')));
+                $form['comment']->addError(new FormError($app->trans('plugin.recommend.type.product_recommend.existed')));
             }
         });
     }
