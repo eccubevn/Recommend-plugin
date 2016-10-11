@@ -97,20 +97,20 @@ var setModeAndSubmit = function(mode, keyname, keyid) {
                             {{ form_label(form.id) }}
                             <div class="col-sm-9 col-lg-10">
                                 {% if Product is not null %}
-                                    <div id="product-image">
+                                    <div id="product_image">
                                         <a href="{{ url('admin_product_product_edit', { id : Product.id }) }}">
                                             <img src="{{ app.config.image_save_urlpath }}/{{ Product.mainFileName|no_image_product }}" style="max-width: 200px;"/>
                                         </a>
                                     </div>
                                     <br>
-                                    <span id="product-code">
+                                    <span id="product_name">
+                                        {{ Product.name }}
+                                    </span>
+                                    <br>
+                                    <span id="product_code">
                                         {{ Product.code_min }}
                                         {% if Product.code_min != Product.code_max %} ～ {{ Product.code_max }}
                                         {% endif %}
-                                    </span>
-                                    <br>
-                                    <span id="product-name">
-                                        {{ Product.name }}
                                     </span>
                                 {% endif %}
 

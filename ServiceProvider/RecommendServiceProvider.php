@@ -75,15 +75,9 @@ class RecommendServiceProvider implements ServiceProviderInterface
         ->value('id', null)->assert('id', '\d+|')
         ->bind('admin_recommend_delete');
 
-        // おすすめ商品のランク移動（上）
-        $app->match('/'.$app["config"]["admin_route"].'/recommend/rank_up/{id}', '\Plugin\Recommend\Controller\RecommendController::rankUp')
-            ->value('id', null)->assert('id', '\d+|')
-            ->bind('admin_recommend_rank_up');
-
-        // おすすめ商品のランク移動（下）
-        $app->match('/'.$app["config"]["admin_route"].'/recommend/rank_down/{id}', '\Plugin\Recommend\Controller\RecommendController::rankDown')
-            ->value('id', null)->assert('id', '\d+|')
-            ->bind('admin_recommend_rank_down');
+        // move rank
+        $app->post('/'.$app["config"]["admin_route"].'/recommend/rank/move', '\Plugin\Recommend\Controller\RecommendController::moveRank')
+            ->bind('admin_recommend_rank_move');
 
         // 商品検索画面表示
         $app->post('/'.$app["config"]["admin_route"].'/recommend/search/product', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')
@@ -131,6 +125,16 @@ class RecommendServiceProvider implements ServiceProviderInterface
                 }
             }
             $config['nav'] = $nav;
+
+            // Update path
+            $pathFile = __DIR__.'/../Resource/config/path.yml';
+            if (file_exists($pathFile)) {
+                $path = Yaml::parse(file_get_contents($pathFile));
+                if (!empty($path)) {
+                    // Replace path
+                    $config = array_replace_recursive($config, $path);
+                }
+            }
 
             // Update constants
             $constantFile = __DIR__.'/../Resource/config/constant.yml';

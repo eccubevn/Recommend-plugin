@@ -54,12 +54,27 @@ class PluginManager extends AbstractPluginManager
     private $blockFileName = 'recommend_product_block';
 
     /**
+     * @var string コピー元リソースディレクトリ
+     */
+    private $origin;
+
+    /**
+     * @var string コピー先リソースディレクトリ
+     */
+    private $target;
+
+    /**
      * PluginManager constructor.
      */
     public function __construct()
     {
         // コピー元ブロックファイル
         $this->originBlock = __DIR__.'/Resource/template/Block/'.$this->blockFileName.'.twig';
+
+        // コピー元のディレクトリ
+        $this->origin = __DIR__.'/Resource/assets';
+        // コピー先のディレクトリ
+        $this->target = '/recommend';
     }
 
     /**
@@ -68,6 +83,9 @@ class PluginManager extends AbstractPluginManager
      */
     public function install($config, $app)
     {
+        // リソースファイルのコピー
+        $this->copyAssets($app);
+
         $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code']);
     }
 
@@ -79,6 +97,9 @@ class PluginManager extends AbstractPluginManager
     {
         // ブロックの削除
         $this->removeBlock($app);
+
+        // リソースファイルの削除
+        $this->removeAssets($app);
 
         $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
     }
@@ -218,5 +239,27 @@ class PluginManager extends AbstractPluginManager
         }
 
         Cache::clear($app, false);
+    }
+
+    /**
+     * リソースファイル等をコピー
+     *
+     * @param $app
+     */
+    private function copyAssets($app)
+    {
+        $file = new Filesystem();
+        $file->mirror($this->origin, $app['config']['plugin_html_realdir'].$this->target.'/assets');
+    }
+
+    /**
+     * コピーしたリソースファイルなどを削除
+     *
+     * @param $app
+     */
+    private function removeAssets($app)
+    {
+        $file = new Filesystem();
+        $file->remove($app['config']['plugin_html_realdir'].$this->target);
     }
 }

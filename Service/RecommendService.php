@@ -23,9 +23,12 @@
 
 namespace Plugin\Recommend\Service;
 
-use Eccube\Application;
 use Eccube\Common\Constant;
 
+/**
+ * Class RecommendService
+ * @package Plugin\Recommend\Service
+ */
 class RecommendService
 {
     /** @var \Eccube\Application */
@@ -36,9 +39,9 @@ class RecommendService
 
     /**
      * コンストラクタ
-     * @param Application $app
+     * @param object $app
      */
-    public function __construct(\Silex\Application $app)
+    public function __construct($app)
     {
         $this->app = $app;
         $this->BaseInfo = $app['eccube.repository.base_info']->get();
@@ -46,36 +49,30 @@ class RecommendService
 
     /**
      * おすすめ商品情報を新規登録する
-     * @param $data
+     * @param array $data
      * @return bool
      */
-    public function createRecommend($data) {
+    public function createRecommend($data)
+    {
         // おすすめ商品詳細情報を生成する
         $Recommend = $this->newRecommend($data);
 
-        $em = $this->app['orm.em'];
-
-        // おすすめ商品情報を登録する
-        $em->persist($Recommend);
-
-        $em->flush();
-
-        return true;
+        return $this->app['eccube.plugin.recommend.repository.recommend_product']->saveRecommend($Recommend);
     }
 
     /**
      * おすすめ商品情報を更新する
-     * @param $data
+     * @param array $data
      * @return bool
      */
-    public function updateRecommend($data) {
+    public function updateRecommend($data)
+    {
         $dateTime = new \DateTime();
-        $em = $this->app['orm.em'];
 
         // おすすめ商品情報を取得する
-        $Recommend =$this->app['eccube.plugin.recommend.repository.recommend_product']->find($data['id']);
-        if(is_null($Recommend)) {
-            false;
+        $Recommend = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($data['id']);
+        if(!$Recommend) {
+            return false;
         }
 
         // おすすめ商品情報を書き換える
@@ -84,123 +81,38 @@ class RecommendService
         $Recommend->setUpdateDate($dateTime);
 
         // おすすめ商品情報を更新する
-        $em->persist($Recommend);
-
-        $em->flush();
-
-        return true;
+        return $this->app['eccube.plugin.recommend.repository.recommend_product']->saveRecommend($Recommend);
     }
 
     /**
      * おすすめ商品情報を削除する
-     * @param $recommendId
+     * @param integer $recommendId
      * @return bool
      */
-    public function deleteRecommend($recommendId) {
+    public function deleteRecommend($recommendId)
+    {
         $currentDateTime = new \DateTime();
-        $em = $this->app['orm.em'];
 
         // おすすめ商品情報を取得する
         $Recommend =$this->app['eccube.plugin.recommend.repository.recommend_product']->find($recommendId);
-        if(is_null($Recommend)) {
-            false;
+        if(!$Recommend) {
+            return false;
         }
         // おすすめ商品情報を書き換える
         $Recommend->setDelFlg(Constant::ENABLED);
         $Recommend->setUpdateDate($currentDateTime);
 
         // おすすめ商品情報を登録する
-        $em->persist($Recommend);
-
-        $em->flush();
-
-        return true;
-    }
-
-    /**
-     * おすすめ商品情報の順位を上げる
-     * @param $recommendId
-     * @return bool
-     */
-    public function rankUp($recommendId) {
-        $currentDateTime = new \DateTime();
-        $em = $this->app['orm.em'];
-
-        // おすすめ商品情報を取得する
-        $Recommend =$this->app['eccube.plugin.recommend.repository.recommend_product']->find($recommendId);
-        if(is_null($Recommend)) {
-            false;
-        }
-        // 対象ランクの上に位置するおすすめ商品を取得する
-        $TargetRecommend =$this->app['eccube.plugin.recommend.repository.recommend_product']
-                                ->findByRankUp($Recommend->getRank());
-        if(is_null($TargetRecommend)) {
-            false;
-        }
-        
-        // ランクを入れ替える
-        $rank = $TargetRecommend->getRank();
-        $TargetRecommend->setRank($Recommend->getRank());
-        $Recommend->setRank($rank);
-        
-        // 更新日設定
-        $Recommend->setUpdateDate($currentDateTime);
-        $TargetRecommend->setUpdateDate($currentDateTime);
-        
-        // 更新
-        $em->persist($Recommend);
-        $em->persist($TargetRecommend);
-
-        $em->flush();
-
-        return true;
-    }
-
-    /**
-     * おすすめ商品情報の順位を下げる
-     * @param $recommendId
-     * @return bool
-     */
-    public function rankDown($recommendId) {
-        $currentDateTime = new \DateTime();
-        $em = $this->app['orm.em'];
-
-        // おすすめ商品情報を取得する
-        $Recommend =$this->app['eccube.plugin.recommend.repository.recommend_product']->find($recommendId);
-        if(is_null($Recommend)) {
-            false;
-        }
-        // 対象ランクの上に位置するおすすめ商品を取得する
-        $TargetRecommend =$this->app['eccube.plugin.recommend.repository.recommend_product']
-                                ->findByRankDown($Recommend->getRank());
-        if(is_null($TargetRecommend)) {
-            false;
-        }
-        
-        // ランクを入れ替える
-        $rank = $TargetRecommend->getRank();
-        $TargetRecommend->setRank($Recommend->getRank());
-        $Recommend->setRank($rank);
-        
-        // 更新日設定
-        $Recommend->setUpdateDate($currentDateTime);
-        $TargetRecommend->setUpdateDate($currentDateTime);
-        
-        // 更新
-        $em->persist($Recommend);
-        $em->persist($TargetRecommend);
-
-        $em->flush();
-
-        return true;
+        return $this->app['eccube.plugin.recommend.repository.recommend_product']->saveRecommend($Recommend);
     }
 
     /**
      * おすすめ商品情報を生成する
-     * @param $data
+     * @param array $data
      * @return \Plugin\Recommend\Entity\RecommendProduct
      */
-    protected function newRecommend($data) {
+    protected function newRecommend($data)
+    {
         $dateTime = new \DateTime();
 
         $rank = $this->app['eccube.plugin.recommend.repository.recommend_product']->getMaxRank();
@@ -215,5 +127,4 @@ class RecommendService
 
         return $Recommend;
     }
-
 }

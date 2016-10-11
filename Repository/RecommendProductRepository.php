@@ -24,14 +24,10 @@
 
 namespace Plugin\Recommend\Repository;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Id\SequenceGenerator;
-use Eccube\Common\Constant;
 use Eccube\Entity\Master\Disp;
+use Plugin\Recommend\Entity\RecommendProduct;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -123,5 +119,53 @@ class RecommendProductRepository extends EntityRepository
             ->getQuery();
 
         return $query->getResult();
+    }
+
+    /**
+     * @param array $arrRank
+     * @return bool
+     * @throws \Exception
+     */
+    public function moveRecommendRank(array $arrRank)
+    {
+        $this->getEntityManager()->beginTransaction();
+        try {
+            foreach ($arrRank as $recommendId => $rank) {
+                /* @var $Recommend RecommendProduct */
+                $Recommend = $this->find($recommendId);
+                if ($Recommend->getRank() == $rank) {
+                    continue;
+                }
+                $Recommend->setRank($rank);
+                $this->getEntityManager()->persist($Recommend);
+            }
+            $this->getEntityManager()->flush();
+            $this->getEntityManager()->commit();
+        } catch (\Exception $e) {
+            $this->getEntityManager()->rollback();
+            throw $e;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param RecommendProduct $RecommendProduct
+     * @return bool
+     * @throws \Exception
+     */
+    public function saveRecommend(RecommendProduct $RecommendProduct)
+    {
+        $this->getEntityManager()->beginTransaction();
+        try {
+            $this->getEntityManager()->persist($RecommendProduct);
+            $this->getEntityManager()->flush();
+            $this->getEntityManager()->commit();
+        } catch (\Exception $e) {
+            $this->getEntityManager()->rollback();
+            throw $e;
+        }
+
+        return true;
     }
 }

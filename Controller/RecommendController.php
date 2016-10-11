@@ -25,6 +25,7 @@ namespace Plugin\Recommend\Controller;
 
 use Eccube\Application;
 use Eccube\Controller\AbstractController;
+use Plugin\Recommend\Entity\RecommendProduct;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -43,9 +44,8 @@ class RecommendController extends AbstractController
      */
     public function index(Application $app, Request $request)
     {
-        $pagination = null;
-
-        $pagination = $app['eccube.plugin.recommend.repository.recommend_product']->findBy(array(), array('rank' => 'DESC'));
+        $limit = $app['config']['recommend_limit'];
+        $pagination = $app['eccube.plugin.recommend.repository.recommend_product']->findBy(array(), array('rank' => 'DESC'), $limit);
 
         return $app->render('Recommend/Resource/template/admin/index.twig', array(
             'pagination' => $pagination,
@@ -189,75 +189,18 @@ class RecommendController extends AbstractController
     }
 
     /**
-     * 上へ
      * @param Application $app
      * @param Request     $request
-     * @param integer     $id
-     * @deprecated It will be removed before release.
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return bool
      */
-    public function rankUp(Application $app, Request $request, $id)
+    public function moveRank(Application $app, Request $request)
     {
-        // Valid token
-        $this->isTokenValid($app);
-
-        if (!$id) {
-            $app->addError('admin.recommend.recommend_id.not_exists', 'admin');
-
-            return $app->redirect($app->url('admin_recommend_list'));
+        if ($request->isXmlHttpRequest()) {
+            $arrRank = $request->request->all();
+            $app['eccube.plugin.recommend.repository.recommend_product']->moveRecommendRank($arrRank);
         }
 
-        // IDからおすすめ商品情報を取得する
-        $Recommend = $app['eccube.plugin.recommend.repository.recommend_product']->find($id);
-        if (!$Recommend) {
-            $app->addError('admin.recommend.not_found', 'admin');
-
-            return $app->redirect($app->url('admin_recommend_list'));
-        }
-
-        // ランクアップ
-        $service = $app['eccube.plugin.recommend.service.recommend'];
-        $service->rankUp($id);
-
-        $app->addSuccess('admin.plugin.recommend.complete.up', 'admin');
-
-        return $app->redirect($app->url('admin_recommend_list'));
-    }
-
-    /**
-     * 下へ
-     * @param Application $app
-     * @param Request     $request
-     * @param integer     $id
-     * @deprecated It will be removed before release.
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function rankDown(Application $app, Request $request, $id)
-    {
-        $this->isTokenValid($app);
-
-        if (!$id) {
-            $app->addError('admin.recommend.recommend_id.not_exists', 'admin');
-
-            return $app->redirect($app->url('admin_recommend_list'));
-        }
-
-
-        // IDからおすすめ商品情報を取得する
-        $Recommend = $app['eccube.plugin.recommend.repository.recommend_product']->find($id);
-        if (!$Recommend) {
-            $app->addError('admin.recommend.not_found', 'admin');
-
-            return $app->redirect($app->url('admin_recommend_list'));
-        }
-
-        // ランクアップ
-        $service = $app['eccube.plugin.recommend.service.recommend'];
-        $service->rankDown($id);
-
-        $app->addSuccess('admin.plugin.recommend.complete.down', 'admin');
-
-        return $app->redirect($app->url('admin_recommend_list'));
+        return true;
     }
 
     /**
