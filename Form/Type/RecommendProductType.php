@@ -32,12 +32,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\FormEvents;
 use Eccube\Form\DataTransformer;
 
+/**
+ * Class RecommendProductType
+ * @package Plugin\Recommend\Form\Type
+ */
 class RecommendProductType extends AbstractType
 {
 
+    /**
+     * @var \Silex\Application
+     */
     private $app;
 
-    public function __construct(\Eccube\Application $app)
+    /**
+     * RecommendProductType constructor.
+     * @param \Silex\Application $app
+     */
+    public function __construct($app)
     {
         $this->app = $app;
     }
@@ -46,8 +57,7 @@ class RecommendProductType extends AbstractType
      * Build config type form
      *
      * @param FormBuilderInterface $builder
-     * @param array $options
-     * @return type
+     * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -68,36 +78,35 @@ class RecommendProductType extends AbstractType
                 ),
             ));
 
-        $builder
-            ->add($builder->create('Product', 'hidden')
-                ->addModelTransformer(new DataTransformer\EntityToIdTransformer(
-                    $this->app['orm.em'],
-                    '\Eccube\Entity\Product'
-                )));
+        $builder->add(
+            $builder
+                ->create('Product', 'hidden')
+                ->addModelTransformer(new DataTransformer\EntityToIdTransformer($this->app['orm.em'], '\Eccube\Entity\Product'))
+        );
 
-        $builder
-            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($app) {
-                $form = $event->getForm();
-                $data = $form->getData();
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($app) {
+            $form = $event->getForm();
+            $data = $form->getData();
 
-                $Product = $data['Product'];
+            // Check product
+            $Product = $data['Product'];
+            if (empty($Product)) {
+                $form['comment']->addError(new FormError($app->trans('plugin.recommend.type.product.not_found')));
 
-                if (empty($Product)) {
-                    $form['comment']->addError(new FormError('商品を追加してください。'));
-                } else {
-                    $RecommendProduct = $app['eccube.plugin.recommend.repository.recommend_product']->findBy(array('Product' => $Product));
+                return;
+            }
 
-                    if ($RecommendProduct) {
-                        //check existing Product, except itself
-                        if (($RecommendProduct[0]->getId() != $data['id'])) {
-                            $form['comment']->addError(new FormError('既に商品が追加されています。'));
-                        }
-                    }
-                }
+            // Check recommend
+            $RecommendProduct = $app['eccube.plugin.recommend.repository.recommend_product']->findOneBy(array('Product' => $Product));
+            if (empty($RecommendProduct)) {
+                return;
+            }
 
-            });
-
-        $builder->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
+            // Check existing Product, except itself
+            if ($RecommendProduct->getId() != $data['id']) {
+                $form['comment']->addError(new FormError($app->trans('plugin.recommend.type.product_recommend.not_found')));
+            }
+        });
     }
 
     /**
@@ -112,9 +121,7 @@ class RecommendProductType extends AbstractType
 
 
     /**
-     *
-     * @ERROR!!!
-     *
+     * @return string
      */
     public function getName()
     {

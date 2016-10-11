@@ -23,74 +23,74 @@
 
 namespace Plugin\Recommend\Controller;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Eccube\Application;
+use Eccube\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception as HttpException;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Eccube\Common\Constant;
 
+/**
+ * Class RecommendSearchModelController
+ * @package Plugin\Recommend\Controller
+ */
 class RecommendSearchModelController
 {
-
-    private $main_title;
-
-    private $sub_title;
-
-    public function __construct()
-    {
-    }
-
     /**
      * 商品検索画面を表示する
      * @param Application $app
      * @param Request     $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response|null
      */
     public function searchProduct(Application $app, Request $request)
     {
-        if ($request->isXmlHttpRequest()) {
-            $app['monolog']->addDebug('search product start.');
-
-            $searchData = array(
-                'name' => $request->get('id'),
-            );
-
-            if ($categoryId = $request->get('category_id')) {
-                $Category = $app['eccube.repository.category']->find($categoryId);
-                $searchData['category_id'] = $Category;
-            }
-
-            /** @var $Products \Eccube\Entity\Product[] */
-            $qb = $app['eccube.repository.product']->getQueryBuilderBySearchData($searchData);
-
-            // 除外するproduct_idを設定する
-            $existProductId = $request->get('exist_product_id');
-            if (strlen($existProductId > 0)) {
-                $qb->andWhere($qb->expr()->notin('p.id', ':existProductId'))
-                    ->setParameter('existProductId', explode(",", $existProductId));
-            }
-
-            $Products = $qb->getQuery()->getResult();
-
-            if (is_null($Products)) {
-                $app['monolog']->addDebug('search product not found.');
-            }
-
-            $forms = array();
-            foreach ($Products as $Product) {
-                /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
-                $builder = $app['form.factory']->createNamedBuilder('', 'add_cart', null, array(
-                    'product' => $Product,
-                ));
-                $addCartForm = $builder->getForm();
-                $forms[$Product->getId()] = $addCartForm->createView();
-            }
-            return $app->render('Recommend/Resource/template/admin/search_product.twig', array(
-                'forms' => $forms,
-                'Products' => $Products,
-            ));
+        if (!$request->isXmlHttpRequest()) {
+            return null;
         }
-    }
 
+        $app['monolog']->addDebug('Search product recommend start!');
+
+        $searchData = array(
+            'name' => $request->get('id'),
+        );
+
+        if ($categoryId = $request->get('category_id')) {
+            $Category = $app['eccube.repository.category']->find($categoryId);
+            $searchData['category_id'] = $Category;
+        }
+
+        /**
+         * @var  ProductRepository
+         */
+        $qb = $app['eccube.repository.product']->getQueryBuilderBySearchData($searchData);
+
+        // 除外するproduct_idを設定する
+        $existProductId = $request->get('exist_product_id');
+        if (strlen($existProductId) > 0) {
+            $qb->andWhere($qb->expr()->notin('p.id', ':existProductId'))
+                ->setParameter('existProductId', explode(",", $existProductId));
+        }
+
+        /**
+         * @var ArrayCollection $arrProduct
+         */
+        $arrProduct = $qb->getQuery()->getResult();
+
+        if (count($arrProduct) == 0) {
+            $app['monolog']->addDebug('Search product not found!');
+        }
+
+        $forms = array();
+        foreach ($arrProduct as $Product) {
+            /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
+            $builder = $app['form.factory']->createNamedBuilder('', 'add_cart', null, array(
+                'product' => $Product,
+            ));
+            $addCartForm = $builder->getForm();
+            $forms[$Product->getId()] = $addCartForm->createView();
+        }
+
+        return $app->render('Recommend/Resource/template/admin/search_product.twig', array(
+            'forms' => $forms,
+            'products' => $arrProduct,
+        ));
+    }
 }

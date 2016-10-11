@@ -22,16 +22,15 @@
  */
 namespace Plugin\Recommend\Entity;
 
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Eccube\Entity\AbstractEntity;
+use Eccube\Entity\Product;
 use Eccube\Util\EntityUtil;
 
 /**
  * RecommendProduct
  */
-class RecommendProduct extends \Eccube\Entity\AbstractEntity
+class RecommendProduct extends AbstractEntity
 {
-
     /**
      *
      * @var integer
@@ -83,7 +82,8 @@ class RecommendProduct extends \Eccube\Entity\AbstractEntity
      * Constructor
      */
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Get recommend product id
@@ -98,8 +98,8 @@ class RecommendProduct extends \Eccube\Entity\AbstractEntity
     /**
      * Set recommend product id
      *
-     * @param integer $recommend_product_id
-     * @return Module
+     * @param integer $id
+     * @return $this
      */
     public function setId($id)
     {
@@ -121,9 +121,8 @@ class RecommendProduct extends \Eccube\Entity\AbstractEntity
     /**
      * Set comment
      *
-     * @param
-     *            string
-     * @return Module
+     * @param string $comment
+     * @return $this
      */
     public function setComment($comment)
     {
@@ -145,9 +144,8 @@ class RecommendProduct extends \Eccube\Entity\AbstractEntity
     /**
      * Set rank
      *
-     * @param
-     *            integer
-     * @return Module
+     * @param integer $rank
+     * @return $this
      */
     public function setRank($rank)
     {
@@ -160,7 +158,7 @@ class RecommendProduct extends \Eccube\Entity\AbstractEntity
      * Set del_flg
      *
      * @param integer $delFlg
-     * @return Order
+     * @return $this
      */
     public function setDelFlg($delFlg)
     {
@@ -183,7 +181,7 @@ class RecommendProduct extends \Eccube\Entity\AbstractEntity
      * Set create_date
      *
      * @param \DateTime $createDate
-     * @return Module
+     * @return $this
      */
     public function setCreateDate($createDate)
     {
@@ -206,7 +204,7 @@ class RecommendProduct extends \Eccube\Entity\AbstractEntity
      * Set update_date
      *
      * @param \DateTime $updateDate
-     * @return Module
+     * @return $this
      */
     public function setUpdateDate($updateDate)
     {
@@ -228,12 +226,13 @@ class RecommendProduct extends \Eccube\Entity\AbstractEntity
     /**
      * Set Product
      *
-     * @param \Eccube\Entity\Product $product
-     * @return Prodcut
+     * @param \Eccube\Entity\Product $Product
+     *
+     * @return $this
      */
-    public function setProduct(\Eccube\Entity\Product $product)
+    public function setProduct(Product $Product)
     {
-        $this->Product = $product;
+        $this->Product = $Product;
 
         return $this;
     }
@@ -241,14 +240,14 @@ class RecommendProduct extends \Eccube\Entity\AbstractEntity
     /**
      * Get Product
      *
-     * @return \Eccube\Entity\Product 
+     * @return \Eccube\Entity\Product|null
      */
     public function getProduct()
     {
         if (EntityUtil::isEmpty($this->Product)) {
             return null;
         }
+
         return $this->Product;
     }
-
 }

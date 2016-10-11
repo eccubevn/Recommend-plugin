@@ -31,6 +31,10 @@ use Eccube\Plugin\AbstractPluginManager;
 use Eccube\Util\Cache;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * Class PluginManager
+ * @package Plugin\Recommend
+ */
 class PluginManager extends AbstractPluginManager
 {
 
@@ -49,41 +53,62 @@ class PluginManager extends AbstractPluginManager
      */
     private $blockFileName = 'recommend_product_block';
 
+    /**
+     * PluginManager constructor.
+     */
     public function __construct()
     {
         // コピー元ブロックファイル
-        $this->originBlock = __DIR__ . '/Resource/template/Block/' . $this->blockFileName . '.twig';
+        $this->originBlock = __DIR__.'/Resource/template/Block/'.$this->blockFileName.'.twig';
     }
 
+    /**
+     * @param array  $config
+     * @param object $app
+     */
     public function install($config, $app)
     {
-        $this->migrationSchema($app, __DIR__ . '/Resource/doctrine/migration', $config['code']);
-
+        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code']);
     }
 
+    /**
+     * @param array  $config
+     * @param object $app
+     */
     public function uninstall($config, $app)
     {
         // ブロックの削除
         $this->removeBlock($app);
 
-        $this->migrationSchema($app, __DIR__ . '/Resource/doctrine/migration', $config['code'], 0);
+        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
     }
 
+    /**
+     * @param array  $config
+     * @param object $app
+     */
     public function enable($config, $app)
     {
         // ブロックへ登録
         $this->copyBlock($app);
     }
 
+    /**
+     * @param array  $config
+     * @param object $app
+     */
     public function disable($config, $app)
     {
         // ブロックの削除
         $this->removeBlock($app);
     }
 
+    /**
+     * @param array  $config
+     * @param object $app
+     */
     public function update($config, $app)
     {
-
     }
 
     /**
@@ -94,11 +119,10 @@ class PluginManager extends AbstractPluginManager
      */
     private function copyBlock($app)
     {
-
         // ファイルコピー
         $file = new Filesystem();
         // ブロックファイルをコピー
-        $file->copy($this->originBlock, $app['config']['block_realdir'] . '/' . $this->blockFileName . '.twig');
+        $file->copy($this->originBlock, $app['config']['block_realdir'].'/'.$this->blockFileName.'.twig');
 
         $em = $app['orm.em'];
         $em->getConnection()->beginTransaction();
@@ -109,48 +133,44 @@ class PluginManager extends AbstractPluginManager
             $Block = $app['eccube.repository.block']->findOrCreate(null, $DeviceType);
 
             // Blockの登録
-            $Block->setName($this->blockName);
-            $Block->setFileName($this->blockFileName);
-            $Block->setDeletableFlg(Constant::DISABLED);
-            $Block->setLogicFlg(1);
+            $Block->setName($this->blockName)
+                ->setFileName($this->blockFileName)
+                ->setDeletableFlg(Constant::DISABLED)
+                ->setLogicFlg(1);
             $em->persist($Block);
-            $em->flush($Block);
 
             // BlockPositionの登録
             $blockPos = $em->getRepository('Eccube\Entity\BlockPosition')->findOneBy(
                 array('page_id' => 1, 'target_id' => PageLayout::TARGET_ID_MAIN_BOTTOM),
-                array('block_row' => 'DESC'));
+                array('block_row' => 'DESC')
+            );
 
             $BlockPosition = new BlockPosition();
 
             // ブロックの順序を変更
+            $BlockPosition->setBlockRow(1);
             if ($blockPos) {
                 $blockRow = $blockPos->getBlockRow() + 1;
                 $BlockPosition->setBlockRow($blockRow);
-            } else {
-                // 1番目にセット
-                $BlockPosition->setBlockRow(1);
             }
 
             $PageLayout = $app['eccube.repository.page_layout']->find(1);
 
-            $BlockPosition->setPageLayout($PageLayout);
-            $BlockPosition->setPageId($PageLayout->getId());
-            $BlockPosition->setTargetId(PageLayout::TARGET_ID_MAIN_BOTTOM);
-            $BlockPosition->setBlock($Block);
-            $BlockPosition->setBlockId($Block->getId());
-            $BlockPosition->setAnywhere(Constant::ENABLED);
+            $BlockPosition->setPageLayout($PageLayout)
+                ->setPageId($PageLayout->getId())
+                ->setTargetId(PageLayout::TARGET_ID_MAIN_BOTTOM)
+                ->setBlock($Block)
+                ->setBlockId($Block->getId())
+                ->setAnywhere(Constant::ENABLED);
 
             $em->persist($BlockPosition);
-            $em->flush($BlockPosition);
+            $em->flush();
 
             $em->getConnection()->commit();
-
         } catch (\Exception $e) {
             $em->getConnection()->rollback();
             throw $e;
         }
-
     }
 
     /**
@@ -162,38 +182,40 @@ class PluginManager extends AbstractPluginManager
     private function removeBlock($app)
     {
         $file = new Filesystem();
-        $file->remove($app['config']['block_realdir'] . '/' . $this->blockFileName . '.twig');
+        $file->remove($app['config']['block_realdir'].'/'.$this->blockFileName.'.twig');
 
         // Blockの取得(file_nameはアプリケーションの仕組み上必ずユニーク)
         /** @var \Eccube\Entity\Block $Block */
         $Block = $app['eccube.repository.block']->findOneBy(array('file_name' => $this->blockFileName));
 
-        if ($Block) {
-            $em = $app['orm.em'];
-            $em->getConnection()->beginTransaction();
+        if (!$Block) {
+            Cache::clear($app, false);
 
-            try {
-                // BlockPositionの削除
-                $blockPositions = $Block->getBlockPositions();
-                /** @var \Eccube\Entity\BlockPosition $BlockPosition */
-                foreach ($blockPositions as $BlockPosition) {
-                    $Block->removeBlockPosition($BlockPosition);
-                    $em->remove($BlockPosition);
-                }
+            return;
+        }
 
-                // Blockの削除
-                $em->remove($Block);
+        $em = $app['orm.em'];
+        $em->getConnection()->beginTransaction();
 
-                $em->flush();
-                $em->getConnection()->commit();
-
-            } catch (\Exception $e) {
-                $em->getConnection()->rollback();
-                throw $e;
+        try {
+            // BlockPositionの削除
+            $blockPositions = $Block->getBlockPositions();
+            /** @var \Eccube\Entity\BlockPosition $BlockPosition */
+            foreach ($blockPositions as $BlockPosition) {
+                $Block->removeBlockPosition($BlockPosition);
+                $em->remove($BlockPosition);
             }
+
+            // Blockの削除
+            $em->remove($Block);
+
+            $em->flush();
+            $em->getConnection()->commit();
+        } catch (\Exception $e) {
+            $em->getConnection()->rollback();
+            throw $e;
         }
 
         Cache::clear($app, false);
-
     }
 }
