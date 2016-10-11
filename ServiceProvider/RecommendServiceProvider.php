@@ -83,7 +83,7 @@ class RecommendServiceProvider implements ServiceProviderInterface
         $app->post('/'.$app["config"]["admin_route"].'/recommend/search/product', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')
             ->bind('admin_recommend_search_product');
 
-        $app->match('/' . $app["config"]["admin_route"] . '/recommend/search/product/page/{page_no}', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')->assert('page_no', '\d+')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend/search/product/page/{page_no}', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')->assert('page_no', '\d+')
             ->bind('admin_recommend_search_product_page');
 
         // ブロック

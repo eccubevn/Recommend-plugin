@@ -26,32 +26,25 @@ namespace Plugin\Recommend\Controller;
 use Eccube\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception as HttpException;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Eccube\Common\Constant;
 
+/**
+ * Class RecommendSearchModelController
+ * @package Plugin\Recommend\Controller
+ */
 class RecommendSearchModelController
 {
-
-    private $main_title;
-
-    private $sub_title;
-
-    public function __construct()
-    {
-    }
-
     /**
      * 商品検索画面を表示する
      * @param Application $app
      * @param Request     $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param integer     $page_no
+     * @return \Symfony\Component\HttpFoundation\Response|null
      */
     public function searchProduct(Application $app, Request $request, $page_no = null)
     {
         if ($request->isXmlHttpRequest()) {
             $app['monolog']->addDebug('search product start.');
-            $page_count = $app['config']['default_page_count'];
+            $pageCount = $app['config']['default_page_count'];
             $session = $app['session'];
             if ('POST' === $request->getMethod()) {
                 $page_no = 1;
@@ -93,7 +86,7 @@ class RecommendSearchModelController
             $pagination = $app['paginator']()->paginate(
                 $qb,
                 $page_no,
-                $page_count,
+                $pageCount,
                 array('wrap-queries' => true)
             );
             /** @var $Products \Eccube\Entity\Product[] */
@@ -119,6 +112,7 @@ class RecommendSearchModelController
                 'pagination' => $pagination,
             ));
         }
-    }
 
+        return null;
+    }
 }
