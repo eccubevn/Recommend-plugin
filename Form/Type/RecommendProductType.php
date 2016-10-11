@@ -92,6 +92,14 @@ class RecommendProductType extends AbstractType
             $form = $event->getForm();
             $data = $form->getData();
 
+            // Check limit of recommend
+            $number = $app['eccube.plugin.recommend.repository.recommend_product']->countRecommend();
+            if ($number >= $app['config']['recommend_limit']) {
+                $form['comment']->addError(new FormError($app->trans('plugin.recommend.type.product.limit')));
+
+                return;
+            }
+
             // Check product
             $Product = $data['Product'];
             if (empty($Product)) {

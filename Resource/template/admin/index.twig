@@ -109,9 +109,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                                 {% for RecommendProduct in pagination %}
                                 <tr class="item_box tr" data-rank="{{ RecommendProduct.rank }}" data-recommend-id="{{ RecommendProduct.id }}">
                                     <td id="product_image" class="item_photo td">
-                                        {#<a href="{{ url('admin_product_product_edit', { id : RecommendProduct.Product.id }) }}">#}
                                         <img src="{{ app.config.image_save_urlpath }}/{{ RecommendProduct.Product.mainFileName|no_image_product }}"/>
-                                        {#</a>#}
                                     </td>
                                     <td class="product_name">
                                         {{ RecommendProduct.Product.name }}

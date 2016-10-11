@@ -39,60 +39,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class RecommendProductRepository extends EntityRepository
 {
     /**
-     * Find by rank up
-     * @param integer $rank
-     * @return mixed
-     * @throws NotFoundHttpException
-     */
-    public function findByRankUp($rank)
-    {
-        try {
-            $qb = $this->createQueryBuilder('rp')
-                ->andWhere('rp.rank > :rank')
-                ->addOrderBy('rp.rank', 'ASC')
-                ->setMaxResults(1);
-
-            $Product = $qb
-                ->getQuery()
-                ->setParameters(array(
-                    'rank' => $rank,
-                ))
-                ->getSingleResult();
-
-            return $Product;
-        } catch (NoResultException $e) {
-            throw new NotFoundHttpException();
-        }
-    }
-
-    /**
-     * Find by rank down
-     * @param integer $rank
-     * @return mixed
-     * @throws NotFoundHttpException
-     */
-    public function findByRankDown($rank)
-    {
-        try {
-            $qb = $this->createQueryBuilder('rp')
-                ->andWhere('rp.rank < :rank')
-                ->addOrderBy('rp.rank', 'DESC')
-                ->setMaxResults(1);
-
-            $Product = $qb
-                ->getQuery()
-                ->setParameters(array(
-                    'rank' => $rank,
-                ))
-                ->getSingleResult();
-
-            return $Product;
-        } catch (NoResultException $e) {
-            throw new NotFoundHttpException();
-        }
-    }
-
-    /**
      * Get max rank
      * @return mixed
      */
@@ -119,6 +65,18 @@ class RecommendProductRepository extends EntityRepository
             ->getQuery();
 
         return $query->getResult();
+    }
+
+    /**
+     * number of recommend
+     * @return mixed
+     */
+    public function countRecommend()
+    {
+        $qb = $this->createQueryBuilder('rp');
+        $qb->select('COUNT(rp)');
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
     /**

@@ -25,7 +25,6 @@ namespace Plugin\Recommend\Controller;
 
 use Eccube\Application;
 use Eccube\Controller\AbstractController;
-use Plugin\Recommend\Entity\RecommendProduct;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -62,7 +61,6 @@ class RecommendController extends AbstractController
      */
     public function create(Application $app, Request $request, $id)
     {
-
         $builder = $app['form.factory']->createBuilder('admin_recommend');
         $form = $builder->getForm();
 

@@ -7,5 +7,5 @@ admin.plugin.recommend.complete.up: おすすめ商品を上へ移動しまし�
 admin.plugin.recommend.complete.down: おすすめ商品を下へ移動しました。
 admin.plugin.recommend.delete.confirm: おすすめ情報を削除してもよろしいですか？
 plugin.recommend.type.product.not_found: 商品を追加してください。
-#plugin.recommend.type.product_recommend.existed: 既に商品が追加されています。
 plugin.recommend.type.product_recommend.existed: この商品はすでにおすすめ商品として登録されています。
+plugin.recommend.type.product.limit: Product is limit
