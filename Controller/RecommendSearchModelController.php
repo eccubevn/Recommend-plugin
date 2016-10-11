@@ -62,19 +62,23 @@ class RecommendSearchModelController
                     $Category = $app['eccube.repository.category']->find($categoryId);
                     $searchData['category_id'] = $Category;
                 }
-                $session->set('eccube.admin.order.product.search', $searchData);
-                $session->set('eccube.admin.order.product.search.page_no', $page_no);
+                $session->set('eccube.plugin.recommend.product.search', $searchData);
+                $session->set('eccube.plugin.recommend.product.search.page_no', $page_no);
             } else {
-                $searchData = (array)$session->get('eccube.admin.order.product.search');
+                $searchData = (array)$session->get('eccube.plugin.recommend.product.search');
                 if (is_null($page_no)) {
-                    $page_no = intval($session->get('eccube.admin.order.product.search.page_no'));
+                    $page_no = intval($session->get('eccube.plugin.recommend.product.search.page_no'));
                 } else {
-                    $session->set('eccube.admin.order.product.search.page_no', $page_no);
+                    $session->set('eccube.plugin.recommend.product.search.page_no', $page_no);
                 }
             }
 
+            //set parameter
+            $searchData['link_status'] = 1;
+            $searchData['id'] = $searchData['name'];
+
             /** @var $Products \Eccube\Entity\Product[] */
-            $qb = $app['eccube.repository.product']->getQueryBuilderBySearchData($searchData);
+            $qb = $app['eccube.repository.product']->getQueryBuilderBySearchDataForAdmin($searchData);
 
             // 除外するproduct_idを設定する
             $existProductId = $request->get('exist_product_id');

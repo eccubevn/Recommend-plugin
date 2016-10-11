@@ -139,4 +139,5 @@ class RecommendProductRepository extends EntityRepository
         return $query->getResult();
 
     }
+
 }
