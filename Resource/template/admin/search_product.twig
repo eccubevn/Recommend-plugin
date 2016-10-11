@@ -9,11 +9,29 @@
 
         return false;
     }
+
+    // 商品検索
+    $('#pagination_wrap a').on('click', function(event) {
+        var list = $('#searchProductModalList');
+        list.children().remove();
+        $.ajax({
+            type: 'GET',
+            dataType: 'html',
+            url: $(this).attr('href'),
+            success: function(data) {
+                $('#searchProductModalList').html(data);
+            },
+            error: function() {
+                alert('paginator failed.');
+            }
+        });
+        event.preventDefault();
+    });
 </script>
 <div class="table-responsive">
     <table class="table">
         <tbody>
-        {% for Product in products %}
+        {% for Product in pagination %}
             <form name="product_form{{ Product.id }}">
                 {% set form = forms[Product.id] %}
 
@@ -37,4 +55,7 @@
 
         </tbody>
     </table>
+    {% if pagination.totalItemCount > 0 %}
+        {% include "pager.twig" with {'pages': pagination.paginationData, 'routes': 'admin_recommend_search_product_page'} %}
+    {% endif %}
 </div>
