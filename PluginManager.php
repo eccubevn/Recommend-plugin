@@ -138,6 +138,7 @@ class PluginManager extends AbstractPluginManager
                 ->setDeletableFlg(Constant::DISABLED)
                 ->setLogicFlg(1);
             $em->persist($Block);
+            $em->flush();
 
             // BlockPositionの登録
             $blockPos = $em->getRepository('Eccube\Entity\BlockPosition')->findOneBy(

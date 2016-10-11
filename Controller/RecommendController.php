@@ -45,7 +45,7 @@ class RecommendController extends AbstractController
     {
         $pagination = null;
 
-        $pagination = $app['eccube.plugin.recommend.repository.recommend_product']->findBy(array(), array('rp.rank' => 'DESC'));
+        $pagination = $app['eccube.plugin.recommend.repository.recommend_product']->findBy(array(), array('rank' => 'DESC'));
 
         return $app->render('Recommend/Resource/template/admin/index.twig', array(
             'pagination' => $pagination,
