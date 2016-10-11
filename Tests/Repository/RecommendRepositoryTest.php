@@ -1,5 +1,12 @@
 <?php
-
+/*
+ * This file is part of the Recommend plugin
+ *
+ * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Plugin\Recommend\Tests\Repository;
 
 use Eccube\Common\Constant;
@@ -7,27 +14,34 @@ use Eccube\Tests\Web\Admin\AbstractAdminWebTestCase;
 use Plugin\Recommend\Entity\RecommendProduct;
 use Eccube\Entity\Master\Disp;
 
+/**
+ * Class RecommendRepositoryTest
+ * @package Plugin\Recommend\Tests\Repository
+ */
 class RecommendRepositoryTest extends AbstractAdminWebTestCase
 {
+    /**
+     * Delete all Recommend for testing
+     */
     public function setUp()
     {
         parent::setUp();
-        $this->initDeleteData();
+        $this->deleteAllRows(array('plg_recommend_product'));
+
+        // recommend for product 1 with rank 1
+        $this->_initRecommendData(1, 1);
+        // recommend for product 2 with rank 2
+        $this->_initRecommendData(2, 2);
     }
 
-    private function initDeleteData()
-    {
-        $Recommends = $this->app['eccube.plugin.recommend.repository.recommend_product']->findAll();
-        foreach ($Recommends as $Recommend) {
-            $this->app['orm.em']->remove($Recommend);
-        }
-        $this->app['orm.em']->flush();
-    }
-
-    private function initRecommendData($productId, $rank)
+    /**
+     * @param $productId
+     * @param $rank
+     * @return RecommendProduct
+     */
+    private function _initRecommendData($productId, $rank)
     {
         $dateTime = new \DateTime();
-        $rank = $rank;
         $fake = $this->getFaker();
 
         $Recommend = new \Plugin\Recommend\Entity\RecommendProduct();
@@ -43,70 +57,51 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
     }
 
     /**
-     * assume : :have 2 elements
-     * get 4 elements
-     */
-    public function testFindList()
-    {
-        $this->initRecommendData(1, 1);
-        $this->initRecommendData(2, 2);
-        $pagination = $this->app['eccube.plugin.recommend.repository.recommend_product']->findList();
-        $this->expected = 2;
-        $this->actual = count($pagination);
-        $this->verify();
-    }
-
-    /**
-     * assume : :have 2 elements
-     * get 1 element from 2
+     * function : findByRankUp
      */
     public function testFindByRankUp()
     {
-        $this->initRecommendData(1, 1);
-        $this->initRecommendData(2, 2);
         $ProductsOver = $this->app['eccube.plugin.recommend.repository.recommend_product']->findByRankUp(1);
+
         $this->expected = 2;
         $this->actual = $ProductsOver->getRank();
         $this->verify();
     }
 
     /**
-     * assume : :have 2 elements
-     * get 1 element from 1
+     * function : findByRankDown
      */
     public function testFindByRankDown()
     {
-        $this->initRecommendData(1, 1);
-        $this->initRecommendData(2, 2);
         $ProductsOver = $this->app['eccube.plugin.recommend.repository.recommend_product']->findByRankDown(2);
+
         $this->expected = 1;
         $this->actual = $ProductsOver->getRank();
         $this->verify();
     }
 
     /**
-     * assume : :have 42 elements
-     * get element with rank 2
+     * function : getMaxRank
      */
     public function testGetMaxRank()
     {
-        $this->initRecommendData(1, 1);
-        $this->initRecommendData(2, 2);
-        $productsOver = $this->app['eccube.plugin.recommend.repository.recommend_product']->getMaxRank();
+        $ProductsOver = $this->app['eccube.plugin.recommend.repository.recommend_product']->getMaxRank();
+
         $this->expected = 2;
-        $this->actual = $productsOver;
+        $this->actual = $ProductsOver;
         $this->verify();
     }
 
+    /**
+     * function : getRecommendProduct
+     */
     public function testGetRecommendProduct()
     {
-        $this->initRecommendData(1, 1);
-        $this->initRecommendData(2, 2);
         $Disp = $this->app['eccube.repository.master.disp']->find(Disp::DISPLAY_SHOW);
         $RecommendProducts = $this->app['eccube.plugin.recommend.repository.recommend_product']->getRecommendProduct($Disp);
+
         $this->expected = 2;
         $this->actual = count($RecommendProducts);
         $this->verify();
     }
-
 }

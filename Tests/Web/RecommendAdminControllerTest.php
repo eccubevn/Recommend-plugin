@@ -14,19 +14,19 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->initDeleteData();
+        $this->deleteAllRows(array('plg_recommend_product'));
+        // recommend for product 1 with rank 1
+        $this->Recommend1 = $this->_initRecommendData(1, 1);
+        // recommend for product 2 with rank 2
+        $this->Recommend2 = $this->_initRecommendData(2, 2);
     }
 
-    private function initDeleteData()
-    {
-        $Recommends = $this->app['eccube.plugin.recommend.repository.recommend_product']->findAll();
-        foreach ($Recommends as $Recommend) {
-            $this->app['orm.em']->remove($Recommend);
-        }
-        $this->app['orm.em']->flush();
-    }
-
-    private function initRecommendData($productId, $rank)
+    /**
+     * @param $productId
+     * @param $rank
+     * @return \Plugin\Recommend\Entity\RecommendProduct
+     */
+    private function _initRecommendData($productId, $rank)
     {
         $dateTime = new \DateTime();
         $fake = $this->getFaker();
@@ -43,16 +43,76 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         return $Recommend;
     }
 
+    /**
+     * testRecommendList
+     */
     public function testRecommendList()
     {
-        $html = $this->client->request('GET', $this->app->url('admin_recommend_list')
-        );
-        $this->assertContains('おすすめ商品内容設定', $html->html());
+        $crawler = $this->client->request('GET', $this->app->url('admin_recommend_list'));
+        $this->assertContains('おすすめ商品内容設定', $crawler->html());
     }
 
+    /**
+     * RecommendSearchModelController
+     */
+    public function testAjaxSearchProduct()
+    {
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_search_product'),
+            array('admin_search_product' => array(
+                                            'id' => '',
+                                            'category_id' => '',
+                                            '_token' => 'dummy'
+            )
+            ),
+            array(),
+            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
+        );
+
+        $productList = $crawler->html();
+        $this->assertContains('パーコレーター', $productList);
+    }
+
+    /**
+     * RecommendSearchModelController
+     */
+    public function testAjaxSearchProductValue()
+    {
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_search_product'),
+            array('admin_search_product' => array(
+                'id' => '',
+                'category_id' => 1,
+                '_token' => 'dummy'
+            )
+            ),
+            array(),
+            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
+        );
+
+        $productList = $crawler->html();
+        $this->assertContains('パーコレーター', $productList);
+    }
+
+    /**
+     * testRecommendCreate
+     */
+    public function testRecommendCreate()
+    {
+        $crawler = $this->client->request('GET', $this->app->url('admin_recommend_new'));
+        $this->assertContains('おすすめ商品管理', $crawler->html());
+    }
+
+    /**
+     * testRecommendNew
+     */
     public function testRecommendNew()
     {
-        $productId = 2;
+        $this->deleteAllRows(array('plg_recommend_product'));
+
+        $productId = 1;
         $editMessage = 'Just Unittest';
         $this->client->request(
             'POST',
@@ -65,21 +125,24 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         );
 
         $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
-        $ProductNew = $this->getRecommend($productId);
+        $ProductNew = $this->_getRecommend($productId);
+
         $this->expected = $editMessage;
         $this->actual = $ProductNew->getComment();
         $this->verify();
     }
 
+    /**
+     * testRecommendEdit
+     */
     public function testRecommendEdit()
     {
-        $Recommend1 = $this->initRecommendData(1, 1);
-        $Recommend2 = $this->initRecommendData(2, 2);
         $productId = 2;
-        $recommendId = $Recommend2->getId();
+        $recommendId = $this->Recommend2->getId();
         $editMessage = 'Just Unittest Edit';
 
-        $this->client->request('POST',
+        $this->client->request(
+            'POST',
             $this->app->url('admin_recommend_edit', array('id' => $recommendId)),
             array(
                 'admin_recommend' => array('_token' => 'dummy',
@@ -90,82 +153,80 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
             )
         );
         $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
-        $ProductNew = $this->getRecommend($productId);
+        $ProductNew = $this->_getRecommend($productId);
+
         $this->expected = $editMessage;
         $this->actual = $ProductNew->getComment();
         $this->verify();
 
     }
 
+    /**
+     * testRecommendDelete
+     */
     public function testRecommendDelete()
     {
-        $Recommend1 = $this->initRecommendData(1, 1);
-        $productId = $Recommend1->getId();
-        $this->client->request('POST',
+        $productId = $this->Recommend1->getId();
+        $this->client->request(
+            'POST',
             $this->app->url('admin_recommend_delete', array('id' => $productId))
         );
         $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
         $ProductNew = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($productId);
+
         $this->expected = 1;
         $this->actual = $ProductNew->getDelFlg();
         $this->verify();
     }
 
+    /**
+     * testRecommendRankUp
+     */
     public function testRecommendRankUp()
     {
-        $Recommend1 = $this->initRecommendData(1, 1);
-        $rankExpected = $Recommend1->getRank();
-        $Recommend2 = $this->initRecommendData(2, 2);
-        $productId = $Recommend1->getId();
-        $this->client->request('PUT',
+        $rankExpected = $this->Recommend1->getRank();
+        $productId = $this->Recommend1->getId();
+        $this->client->request(
+            'PUT',
             $this->app->url('admin_recommend_rank_up', array('id' => $productId)),
             array('id' => $productId, '_token' => 'dummy')
         );
         $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
         $ProductNew = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($productId);
+
         $this->expected = $rankExpected + 1;
         $this->actual = $ProductNew->getRank();
         $this->verify();
     }
 
+    /**
+     * testRecommendDown
+     */
     public function testRecommendDown()
     {
-        $Recommend1 = $this->initRecommendData(1, 1);
-        $Recommend2 = $this->initRecommendData(2, 2);
-        $rankExpected = $Recommend2->getRank();
-        $productId = $Recommend2->getId();
-        $this->client->request('PUT',
+        $rankExpected = $this->Recommend2->getRank();
+        $productId = $this->Recommend2->getId();
+        $this->client->request(
+            'PUT',
             $this->app->url('admin_recommend_rank_down', array('id' => $productId)),
             array('id' => $productId, '_token' => 'dummy')
         );
         $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
         $ProductNew = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($productId);
+
         $this->expected = $rankExpected - 1;
         $this->actual = $ProductNew->getRank();
         $this->verify();
     }
 
-    public function testcaseRecommendSearchProduct()
-    {
-        $this->initRecommendData(1, 1);
-        $this->initRecommendData(2, 2);
-        $crawler = $this->client->request('POST',
-            $this->app->url('admin_recommend_search_product'),
-            array('admin_search_product' => array(
-                'id' => '',
-                'category_id' => '4',
-                '_token' => 'dummy',
-            )
-            ), array(),
-            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
-        );
-        $message = '<div class="table-responsive">';
-        $this->assertContains($message, $crawler->html());
-    }
-
-    private function getRecommend($productId)
+    /**
+     * @param $productId
+     * @return mixed
+     */
+    private function _getRecommend($productId)
     {
         $Product = $this->app['eccube.repository.product']->find($productId);
+
         return $this->app['eccube.plugin.recommend.repository.recommend_product']->findOneBy(array('Product' => $Product));
     }
 }
