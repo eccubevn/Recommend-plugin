@@ -39,8 +39,8 @@ $(function() {
     );
 
     $('#searchProductModalButton').on('click', function() {
-        var tbody = $('#searchProductModalList tbody');
-        tbody.children().remove();
+        var list = $('#searchProductModalList');
+        list.children().remove();
         $.ajax({
             type: 'POST',
             dataType: 'html',
