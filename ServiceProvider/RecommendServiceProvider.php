@@ -48,7 +48,7 @@ class RecommendServiceProvider implements ServiceProviderInterface
     {
         // おすすめ情報テーブルリポジトリ
         $app['eccube.plugin.recommend.repository.recommend_product'] = $app->share(function () use ($app) {
-            return $app['orm.em']->getRepository('\Plugin\Recommend\Entity\RecommendProduct');
+            return $app['orm.em']->getRepository('Plugin\Recommend\Entity\RecommendProduct');
         });
 
         // おすすめ商品の一覧
