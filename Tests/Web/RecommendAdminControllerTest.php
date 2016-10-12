@@ -180,46 +180,6 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     }
 
     /**
-     * testRecommendRankUp
-     */
-    public function testRecommendRankUp()
-    {
-        $rankExpected = $this->Recommend1->getRank();
-        $productId = $this->Recommend1->getId();
-        $this->client->request(
-            'PUT',
-            $this->app->url('admin_recommend_rank_up', array('id' => $productId)),
-            array('id' => $productId, '_token' => 'dummy')
-        );
-        $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
-        $ProductNew = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($productId);
-
-        $this->expected = $rankExpected + 1;
-        $this->actual = $ProductNew->getRank();
-        $this->verify();
-    }
-
-    /**
-     * testRecommendDown
-     */
-    public function testRecommendDown()
-    {
-        $rankExpected = $this->Recommend2->getRank();
-        $productId = $this->Recommend2->getId();
-        $this->client->request(
-            'PUT',
-            $this->app->url('admin_recommend_rank_down', array('id' => $productId)),
-            array('id' => $productId, '_token' => 'dummy')
-        );
-        $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
-        $ProductNew = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($productId);
-
-        $this->expected = $rankExpected - 1;
-        $this->actual = $ProductNew->getRank();
-        $this->verify();
-    }
-
-    /**
      * @param $productId
      * @return mixed
      */

@@ -57,30 +57,6 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
     }
 
     /**
-     * function : findByRankUp
-     */
-    public function testFindByRankUp()
-    {
-        $ProductsOver = $this->app['eccube.plugin.recommend.repository.recommend_product']->findByRankUp(1);
-
-        $this->expected = 2;
-        $this->actual = $ProductsOver->getRank();
-        $this->verify();
-    }
-
-    /**
-     * function : findByRankDown
-     */
-    public function testFindByRankDown()
-    {
-        $ProductsOver = $this->app['eccube.plugin.recommend.repository.recommend_product']->findByRankDown(2);
-
-        $this->expected = 1;
-        $this->actual = $ProductsOver->getRank();
-        $this->verify();
-    }
-
-    /**
      * function : getMaxRank
      */
     public function testGetMaxRank()
