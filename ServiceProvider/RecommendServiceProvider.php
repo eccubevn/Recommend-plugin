@@ -29,6 +29,7 @@ use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Plugin\Recommend\Form\Type\RecommendProductType;
 use Plugin\Recommend\Service\RecommendService;
+use Plugin\Recommend\Twig\Extension\FilterBlackListedExtension;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
@@ -143,6 +144,12 @@ class RecommendServiceProvider implements ServiceProviderInterface
             }
 
             return $config;
+        }));
+
+        $app['twig'] = $app->share($app->extend('twig', function (\Twig_Environment $twig, \Silex\Application $app) {
+            $twig->addExtension(new FilterBlackListedExtension($app));
+
+            return $twig;
         }));
 
         // ログファイル設定
