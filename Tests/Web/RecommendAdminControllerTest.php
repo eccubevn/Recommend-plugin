@@ -3,6 +3,7 @@ namespace Plugin\Recommend\Tests\Web;
 
 use Eccube\Common\Constant;
 use Eccube\Tests\Web\Admin\AbstractAdminWebTestCase;
+use Plugin\Recommend\Entity\RecommendProduct;
 use Symfony\Component\DomCrawler\Crawler;
 
 
@@ -31,7 +32,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         $dateTime = new \DateTime();
         $fake = $this->getFaker();
 
-        $Recommend = new \Plugin\Recommend\Entity\RecommendProduct();
+        $Recommend = new RecommendProduct();
         $Recommend->setComment($fake->word);
         $Recommend->setProduct($this->app['eccube.repository.product']->find($productId));
         $Recommend->setRank($rank);
@@ -158,7 +159,6 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         $this->expected = $editMessage;
         $this->actual = $ProductNew->getComment();
         $this->verify();
-
     }
 
     /**

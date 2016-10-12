@@ -44,7 +44,7 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
         $dateTime = new \DateTime();
         $fake = $this->getFaker();
 
-        $Recommend = new \Plugin\Recommend\Entity\RecommendProduct();
+        $Recommend = new RecommendProduct();
         $Recommend->setComment($fake->word);
         $Recommend->setProduct($this->app['eccube.repository.product']->find($productId));
         $Recommend->setRank($rank);
