@@ -27,7 +27,6 @@ use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
 use Eccube\Application;
-use Plugin\Recommend\Entity\RecommendProduct;
 
 /**
  * Class Version201610101130
