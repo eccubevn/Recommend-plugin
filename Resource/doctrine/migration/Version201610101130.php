@@ -29,10 +29,10 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Eccube\Application;
 
 /**
- * Class Version201510211300
+ * Class Version201610101130
  * @package DoctrineMigrations
  */
-class Version201510211300 extends AbstractMigration
+class Version201610101130 extends AbstractMigration
 {
     /**
      * @var string table name
