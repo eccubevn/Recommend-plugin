@@ -12,8 +12,12 @@ namespace Plugin\Recommend\Tests\Web;
 
 use Eccube\Common\Constant;
 use Eccube\Tests\Web\AbstractWebTestCase;
-use Plugin\Recommend\Entity\RecommendProduct;
+use Symfony\Component\DomCrawler\Crawler;
 
+/**
+ * Class RecommendControllerTest
+ * @package Plugin\Recommend\Tests\Web
+ */
 class RecommendControllerTest extends AbstractWebTestCase
 {
     /**
@@ -24,31 +28,9 @@ class RecommendControllerTest extends AbstractWebTestCase
         parent::setUp();
 
         // recommend for product 1 with rank 1
-        $this->_initRecommendData(1, 1);
+        $this->initRecommendData(1, 1);
         // recommend for product 2 with rank 2
-        $this->_initRecommendData(2, 2);
-    }
-
-    /**
-     * @param $productId
-     * @param $rank
-     * @return \Plugin\Recommend\Entity\RecommendProduct
-     */
-    private function _initRecommendData($productId, $rank)
-    {
-        $dateTime = new \DateTime();
-        $fake = $this->getFaker();
-
-        $Recommend = new RecommendProduct();
-        $Recommend->setComment($fake->word);
-        $Recommend->setProduct($this->app['eccube.repository.product']->find($productId));
-        $Recommend->setRank($rank);
-        $Recommend->setDelFlg(Constant::DISABLED);
-        $Recommend->setCreateDate($dateTime);
-        $Recommend->setUpdateDate($dateTime);
-        $this->app['orm.em']->persist($Recommend);
-        $this->app['orm.em']->flush();
-        return $Recommend;
+        $this->initRecommendData(2, 2);
     }
 
     /**
@@ -63,4 +45,27 @@ class RecommendControllerTest extends AbstractWebTestCase
 
         $this->assertContains('<div id="item_list">', $crawler->html());
     }
+    /**
+     * @param $productId
+     * @param $rank
+     * @return \Plugin\Recommend\Entity\RecommendProduct
+     */
+    private function initRecommendData($productId, $rank)
+    {
+        $dateTime = new \DateTime();
+        $fake = $this->getFaker();
+
+        $Recommend = new \Plugin\Recommend\Entity\RecommendProduct();
+        $Recommend->setComment($fake->word);
+        $Recommend->setProduct($this->app['eccube.repository.product']->find($productId));
+        $Recommend->setRank($rank);
+        $Recommend->setDelFlg(Constant::DISABLED);
+        $Recommend->setCreateDate($dateTime);
+        $Recommend->setUpdateDate($dateTime);
+        $this->app['orm.em']->persist($Recommend);
+        $this->app['orm.em']->flush();
+
+        return $Recommend;
+    }
+
 }

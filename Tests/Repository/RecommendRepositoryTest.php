@@ -29,32 +29,12 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
         $this->deleteAllRows(array('plg_recommend_product'));
 
         // recommend for product 1 with rank 1
-        $this->_initRecommendData(1, 1);
+        $this->initRecommendData(1, 1);
         // recommend for product 2 with rank 2
-        $this->_initRecommendData(2, 2);
+        $this->initRecommendData(2, 2);
     }
 
-    /**
-     * @param $productId
-     * @param $rank
-     * @return RecommendProduct
-     */
-    private function _initRecommendData($productId, $rank)
-    {
-        $dateTime = new \DateTime();
-        $fake = $this->getFaker();
 
-        $Recommend = new RecommendProduct();
-        $Recommend->setComment($fake->word);
-        $Recommend->setProduct($this->app['eccube.repository.product']->find($productId));
-        $Recommend->setRank($rank);
-        $Recommend->setDelFlg(Constant::DISABLED);
-        $Recommend->setCreateDate($dateTime);
-        $Recommend->setUpdateDate($dateTime);
-        $this->app['orm.em']->persist($Recommend);
-        $this->app['orm.em']->flush();
-        return $Recommend;
-    }
 
     /**
      * function : getMaxRank
@@ -79,5 +59,28 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
         $this->expected = 2;
         $this->actual = count($RecommendProducts);
         $this->verify();
+    }
+
+    /**
+     * @param $productId
+     * @param $rank
+     * @return RecommendProduct
+     */
+    private function initRecommendData($productId, $rank)
+    {
+        $dateTime = new \DateTime();
+        $fake = $this->getFaker();
+
+        $Recommend = new \Plugin\Recommend\Entity\RecommendProduct();
+        $Recommend->setComment($fake->word);
+        $Recommend->setProduct($this->app['eccube.repository.product']->find($productId));
+        $Recommend->setRank($rank);
+        $Recommend->setDelFlg(Constant::DISABLED);
+        $Recommend->setCreateDate($dateTime);
+        $Recommend->setUpdateDate($dateTime);
+        $this->app['orm.em']->persist($Recommend);
+        $this->app['orm.em']->flush();
+
+        return $Recommend;
     }
 }
