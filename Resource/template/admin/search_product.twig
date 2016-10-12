@@ -1,12 +1,26 @@
 <script>
-    function fnSelectProduct($row, product_id, product_name) {
-
+    function fnSelectProduct($row, product_id, product_name, product_image_link, product_image_img, product_code_min, product_code_max) {
+        //add product argument
         $('#product_name').text(product_name);
         $('#admin_recommend_Product').val(product_id);
-
+        $('#product_image_link').removeAttr('href');
+        $('#product_image_link').attr('href', product_image_link);
+        $('#product_image_img').removeAttr('src');
+        $('#product_image_img').attr('src', product_image_img);
+        if(product_code_min != product_code_max)
+            product_code_min += ' ～ ' + product_code_max;
+        $('#product_code').text(product_code_min);
+        //display new product
+        $('#product_image').removeClass('hidden');
+        $('#product_name').removeClass('hidden');
+        $('#product_code').removeClass('hidden');
         // モーダル閉じる.
         $('#searchProductModal').modal('hide');
         return false;
+    }
+    
+    function createProductImage(product_id, product_image) {
+
     }
 
     // 商品検索
@@ -44,7 +58,7 @@
                         {% endif %}
                     </td>
                     <td class="text-right">
-                        <button onclick="fnSelectProduct($(this).parent().parent(), {{ Product.id }},  '{{ Product.name }}')" type="button" class="btn btn-default btn-sm">
+                        <button onclick="fnSelectProduct($(this).parent().parent(), '{{ Product.id }}', '{{ Product.name }}', '{{ url('admin_product_product_edit', { id : Product.id }) }}', '{{ app.config.image_save_urlpath }}/{{ Product.mainFileName|no_image_product }}', '{{ Product.code_min }}', '{{ Product.code_max }}')" type="button" class="btn btn-default btn-sm">
                             決定
                         </button>
                     </td>
