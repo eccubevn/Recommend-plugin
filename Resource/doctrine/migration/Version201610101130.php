@@ -70,7 +70,7 @@ class Version201610101130 extends AbstractMigration
         $app = Application::getInstance();
         $em = $app['orm.em'];
         $classes = array(
-            $em->getClassMetadata('\Plugin\Recommend\Entity\RecommendProduct'),
+            $em->getClassMetadata('Plugin\Recommend\Entity\RecommendProduct'),
         );
         $tool = new SchemaTool($em);
         $tool->createSchema($classes);

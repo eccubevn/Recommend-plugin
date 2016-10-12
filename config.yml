@@ -6,4 +6,4 @@ service:
 orm.path:
     - /Resource/doctrine
 migration.path:
-    - /Resource/migration
+    - /Resource/doctrine/migration
