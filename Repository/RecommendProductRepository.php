@@ -28,7 +28,6 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Eccube\Entity\Master\Disp;
 use Plugin\Recommend\Entity\RecommendProduct;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * RecommendProductRepository
@@ -54,17 +53,22 @@ class RecommendProductRepository extends EntityRepository
     /**
      * @param Disp $Disp
      * @return array
+     * @throws NoResultException
      */
     public function getRecommendProduct(Disp $Disp)
     {
-        $query = $this->createQueryBuilder('rp')
-            ->innerJoin('Eccube\Entity\Product', 'p', 'WITH', 'p.id = rp.Product')
-            ->where('p.Status = :Disp')
-            ->orderBy('rp.rank', 'DESC')
-            ->setParameter('Disp', $Disp)
-            ->getQuery();
+        try {
+            $query = $this->createQueryBuilder('rp')
+                ->innerJoin('Eccube\Entity\Product', 'p', 'WITH', 'p.id = rp.Product')
+                ->where('p.Status = :Disp')
+                ->orderBy('rp.rank', 'DESC')
+                ->setParameter('Disp', $Disp)
+                ->getQuery();
 
-        return $query->getResult();
+            return $query->getResult();
+        } catch (NoResultException $exception) {
+            throw $exception;
+        }
     }
 
     /**
