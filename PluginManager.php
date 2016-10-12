@@ -85,8 +85,6 @@ class PluginManager extends AbstractPluginManager
     {
         // リソースファイルのコピー
         $this->copyAssets($app);
-
-        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code']);
     }
 
     /**
@@ -95,13 +93,9 @@ class PluginManager extends AbstractPluginManager
      */
     public function uninstall($config, $app)
     {
-        // ブロックの削除
-        $this->removeBlock($app);
-
+        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
         // リソースファイルの削除
         $this->removeAssets($app);
-
-        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
     }
 
     /**
@@ -112,6 +106,8 @@ class PluginManager extends AbstractPluginManager
     {
         // ブロックへ登録
         $this->copyBlock($app);
+
+        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code']);
     }
 
     /**
