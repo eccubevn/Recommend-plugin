@@ -80,8 +80,6 @@ class RecommendSearchModelController
                     ->setParameter('existProductId', explode(",", $existProductId));
             }
 
-            $Products = $qb->getQuery()->getResult();
-
             /** @var \Knp\Component\Pager\Pagination\SlidingPagination $pagination */
             $pagination = $app['paginator']()->paginate(
                 $qb,
