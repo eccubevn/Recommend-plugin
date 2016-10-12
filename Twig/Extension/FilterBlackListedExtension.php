@@ -49,7 +49,7 @@ class FilterBlackListedExtension extends \Twig_Extension
     public function htmlFilter($html)
     {
         foreach ($this->blacklistedTags as $tag) {
-            $html = str_replace(array('<'.$tag.'>', '</'.$tag.'>'), array('', ''), $html);
+            $html = str_replace(array('<'.$tag.'>', '</'.$tag.'>'), array('&lt;'.$tag.'&gt;', '&lt;/'.$tag.'&gt;'), $html);
         }
 
         return $html;
