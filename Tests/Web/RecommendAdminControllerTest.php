@@ -36,56 +36,47 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
 
     /**
      * testRecommendList
+     * none recommend
      */
-    public function testRecommendList()
+    public function testRecommendListEmpty()
     {
+        $this->deleteAllRows(array('plg_recommend_product'));
         $crawler = $this->client->request('GET', $this->app->url('admin_recommend_list'));
-        $this->assertContains('おすすめ商品内容設定', $crawler->html());
+        $this->assertContains('0 件', $crawler->html());
     }
 
     /**
-     * RecommendSearchModelController
+     * testRecommendList
+     * none recommend
      */
-    public function testAjaxSearchProduct()
+    public function testRecommendList99()
     {
-        $crawler = $this->client->request(
-            'POST',
-            $this->app->url('admin_recommend_search_product'),
-            array('admin_search_product' => array(
-                                            'id' => '',
-                                            'category_id' => '',
-                                            '_token' => 'dummy',
-            ),
-            ),
-            array(),
-            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
-        );
+        for ($i = 3; $i < 100; $i++) {
+            $Product = $this->createProduct();
+            $this->initRecommendData( $Product->getId(), $i);
+        }
 
-        $productList = $crawler->html();
-        $this->assertContains('パーコレーター', $productList);
+        $this->Recommend1 = $this->initRecommendData(1, 1);
+        $crawler = $this->client->request('GET', $this->app->url('admin_recommend_list'));
+        $this->assertContains('100 件', $crawler->html());
     }
 
     /**
-     * RecommendSearchModelController
+     * testRecommendList
+     * none recommend
      */
-    public function testAjaxSearchProductValue()
+    public function testRecommendList105()
     {
-        $crawler = $this->client->request(
-            'POST',
-            $this->app->url('admin_recommend_search_product'),
-            array('admin_search_product' => array(
-                'id' => '',
-                'category_id' => 1,
-                '_token' => 'dummy',
-            ),
-            ),
-            array(),
-            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
-        );
+        for ($i = 3; $i < 106; $i++) {
+            $Product = $this->createProduct();
+            $this->initRecommendData( $Product->getId(), $i);
+        }
 
-        $productList = $crawler->html();
-        $this->assertContains('パーコレーター', $productList);
+        $this->Recommend1 = $this->initRecommendData(1, 1);
+        $crawler = $this->client->request('GET', $this->app->url('admin_recommend_list'));
+        $this->assertContains('100 件', $crawler->html());
     }
+
 
     /**
      * testRecommendCreate
@@ -94,6 +85,69 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     {
         $crawler = $this->client->request('GET', $this->app->url('admin_recommend_new'));
         $this->assertContains('おすすめ商品管理', $crawler->html());
+    }
+
+    /**
+     * testRecommendNew
+     */
+    public function testRecommendNewEmpty()
+    {
+        $this->deleteAllRows(array('plg_recommend_product'));
+
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_new'),
+            array('admin_recommend' => array(
+                '_token' => 'dummy',
+                'comment' => '',
+                'Product' => '',
+            ),
+            )
+        );
+
+        $this->assertContains('入力されていません。商品を追加してください。', $crawler->html());
+    }
+
+    /**
+     * testRecommendNew
+     */
+    public function testRecommendNewProduct()
+    {
+        $this->deleteAllRows(array('plg_recommend_product'));
+        $productId = 1;
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_new'),
+            array('admin_recommend' => array(
+                '_token' => 'dummy',
+                'comment' => '',
+                'Product' => $productId,
+            ),
+            )
+        );
+
+        $this->assertContains('入力されていません。', $crawler->html());
+    }
+
+    /**
+     * testRecommendNew
+     */
+    public function testRecommendNewComment()
+    {
+        $this->deleteAllRows(array('plg_recommend_product'));
+        $fake = $this->getFaker();
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_new'),
+            array('admin_recommend' => array(
+                '_token' => 'dummy',
+                'comment' => $fake->word,
+                'Product' => '',
+            ),
+            )
+        );
+
+        $this->assertContains('入力されていません。', $crawler->html());
     }
 
     /**
@@ -123,6 +177,120 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         $this->actual = $ProductNew->getComment();
         $this->verify();
     }
+
+
+    /**
+     * RecommendSearchModelController
+     */
+    public function testAjaxSearchProductEmpty()
+    {
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_search_product'),
+            array('admin_search_product' => array(
+                                            'id' => '',
+                                            'category_id' => '',
+                                            '_token' => 'dummy',
+            ),
+            ),
+            array(),
+            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
+        );
+
+        $productList = $crawler->html();
+        $this->assertContains('ディナーフォーク', $productList);
+        $this->assertContains('パーコレーター', $productList);
+    }
+
+    /**
+     * RecommendSearchModelController
+     */
+    public function testAjaxSearchProductValue()
+    {
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_search_product'),
+            array('admin_search_product' => array(
+                'id' => '',
+                'category_id' => 1,
+                '_token' => 'dummy',
+            ),
+            ),
+            array(),
+            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
+        );
+
+        $productList = $crawler->html();
+        $this->assertContains('パーコレーター', $productList);
+    }
+
+    /**
+     * RecommendSearchModelController
+     */
+    public function testAjaxSearchProductValueCode()
+    {
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_search_product'),
+            array('admin_search_product' => array(
+                'id' => 'cafe-01',
+                'category_id' => '',
+                '_token' => 'dummy',
+            ),
+            ),
+            array(),
+            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
+        );
+
+        $productList = $crawler->html();
+        $this->assertContains('パーコレーター', $productList);
+    }
+
+    /**
+     * RecommendSearchModelController
+     */
+    public function testAjaxSearchProductValueId()
+    {
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_search_product'),
+            array('admin_search_product' => array(
+                'id' => 1,
+                'category_id' => '',
+                '_token' => 'dummy',
+            ),
+            ),
+            array(),
+            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
+        );
+
+        $productList = $crawler->html();
+        $this->assertContains('パーコレーター', $productList);
+    }
+
+    /**
+     * RecommendSearchModelController
+     */
+    public function testAjaxSearchProductCategory()
+    {
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_search_product'),
+            array('admin_search_product' => array(
+                'id' => '',
+                'category_id' => 6,
+                '_token' => 'dummy',
+            ),
+            ),
+            array(),
+            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
+        );
+
+        $productList = $crawler->html();
+        $this->assertContains('ディナーフォーク', $productList);
+        $this->assertContains('パーコレーター', $productList);
+    }
+
 
     /**
      * testRecommendEdit
