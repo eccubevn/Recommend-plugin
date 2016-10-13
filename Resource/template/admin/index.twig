@@ -103,7 +103,7 @@
                                         {% if RecommendProduct.Product.code_min != RecommendProduct.Product.code_max %} ～ {{ RecommendProduct.Product.code_max }}
                                         {% endif %}
                                     </td>
-                                    <td class="comment">{{ RecommendProduct.comment|filter_black_listed()|raw }}</td>
+                                    <td class="comment">{{ RecommendProduct.comment|raw }}</td>
                                     <td class="icon_edit">
                                         <div class="dropdown">
                                             <a class="dropdown-toggle" data-toggle="dropdown"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>

@@ -134,12 +134,6 @@ class RecommendServiceProvider implements ServiceProviderInterface
             return $config;
         }));
 
-        $app['twig'] = $app->share($app->extend('twig', function (\Twig_Environment $twig, \Silex\Application $app) {
-            $twig->addExtension(new FilterBlackListedExtension($app));
-
-            return $twig;
-        }));
-
         // ログファイル設定
         $app['monolog.Recommend'] = $app->share(function ($app) {
             $loggerClass = $app['monolog.logger.class'];
