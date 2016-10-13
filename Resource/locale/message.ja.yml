@@ -3,8 +3,6 @@ admin.recommend.recommend_id.not_exists: おすすめ商品IDがありません�
 admin.plugin.recommend.register.success: おすすめ商品を登録しました。
 admin.plugin.recommend.update.success: おすすめ商品を修正しました。
 admin.plugin.recommend.delete.success: おすすめ商品を削除しました。
-admin.plugin.recommend.complete.up: おすすめ商品を上へ移動しました。
-admin.plugin.recommend.complete.down: おすすめ商品を下へ移動しました。
 admin.plugin.recommend.delete.confirm: おすすめ情報を削除してもよろしいですか？
 plugin.recommend.type.product.not_found: 商品を追加してください。
 plugin.recommend.type.product_recommend.existed: この商品はすでにおすすめ商品として登録されています。

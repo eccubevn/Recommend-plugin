@@ -75,15 +75,17 @@ class RecommendController extends AbstractController
             $service = $app['eccube.plugin.recommend.service.recommend'];
             $data = $form->getData();
             if (is_null($data['id'])) {
-                $status = $service->createRecommend($data);
+                if ($status = $service->createRecommend($data)) {
+                    $app->addSuccess('admin.plugin.recommend.register.success', 'admin');
+                }
             } else {
-                $status = $service->updateRecommend($data);
+                if ($status = $service->updateRecommend($data)) {
+                    $app->addSuccess('admin.plugin.recommend.update.success', 'admin');
+                }
             }
 
             if (!$status) {
                 $app->addError('admin.recommend.not_found', 'admin');
-            } else {
-                $app->addSuccess('admin.plugin.recommend.update.success', 'admin');
             }
 
             return $app->redirect($app->url('admin_recommend_list'));
