@@ -18,7 +18,7 @@ environment:
     DBPASS: "Password12!"
     DBUSER: "root"
     BASE_DIR: "C:/projects/ec-cube"
-    PLUGIN_BASE_DIR: "C:/projects/product-recommend"
+    PLUGIN_BASE_DIR: "C:/projects/Recommend-plugin"
     ECCUBE_VERSION: "master"
     PLUGIN_CODE: "Recommend"
   matrix:
