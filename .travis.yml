@@ -32,6 +32,11 @@ env:
 
 matrix:
   fast_finish: true
+  allow_failures:
+    - PHP: 7
+      env: ECCUBE_VERSION=3.0.9
+    - PHP: 7
+      env: ECCUBE_VERSION=3.0.10
 
 install:
   - gem install mime-types -v 2.99.1
