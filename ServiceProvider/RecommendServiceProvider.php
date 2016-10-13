@@ -43,7 +43,8 @@ class RecommendServiceProvider implements ServiceProviderInterface
             ->bind('admin_recommend_list');
 
         // おすすめ商品の新規先
-        $app->match('/'.$app["config"]["admin_route"].'/recommend/new', '\Plugin\Recommend\Controller\RecommendController::create')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend/new', '\Plugin\Recommend\Controller\RecommendController::edit')
+            ->value('id', null)->assert('id', '\d+|')
             ->bind('admin_recommend_new');
 
         // おすすめ商品の編集
@@ -52,7 +53,7 @@ class RecommendServiceProvider implements ServiceProviderInterface
             ->bind('admin_recommend_edit');
 
         // おすすめ商品の削除
-        $app->match('/'.$app["config"]["admin_route"].'/recommend/{id}/delete', '\Plugin\Recommend\Controller\RecommendController::delete')
+        $app->delete('/'.$app["config"]["admin_route"].'/recommend/{id}/delete', '\Plugin\Recommend\Controller\RecommendController::delete')
         ->value('id', null)->assert('id', '\d+|')
         ->bind('admin_recommend_delete');
 

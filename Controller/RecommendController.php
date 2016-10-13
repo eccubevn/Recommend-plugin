@@ -41,71 +41,28 @@ class RecommendController extends AbstractController
     }
 
     /**
-     * おすすめ商品の新規作成
-     *
-     * @param Application $app
-     * @param Request     $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function create(Application $app, Request $request)
-    {
-        $builder = $app['form.factory']->createBuilder('admin_recommend');
-        $form = $builder->getForm();
-
-        $Product = null;
-        if ('POST' === $request->getMethod()) {
-            $form->handleRequest($request);
-            $data = $form->getData();
-            if ($form->isValid()) {
-                $service = $app['eccube.plugin.recommend.service.recommend'];
-                $status = $service->createRecommend($data);
-
-                if (!$status) {
-                    $app->addError('admin.recommend.not_found', 'admin');
-                } else {
-                    $app->addSuccess('admin.plugin.recommend.register.success', 'admin');
-                }
-
-                return $app->redirect($app->url('admin_recommend_list'));
-            }
-
-            if (!empty($data['Product'])) {
-                $Product = $data['Product'];
-            }
-        }
-
-        return $this->registerView(
-            $app,
-            array(
-                'form' => $form->createView(),
-                'Product' => $Product,
-            )
-        );
-    }
-
-    /**
-     * 編集
+     * Create & Edit
      *
      * @param Application $app
      * @param Request     $request
      * @param integer     $id
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function edit(Application $app, Request $request, $id)
+    public function edit(Application $app, Request $request, $id = null)
     {
-        if (!$id) {
-            $app->addError('admin.recommend.recommend_id.not_exists', 'admin');
+        $Recommend = null;
+        $Product = null;
+        if (!is_null($id)) {
+            // IDからおすすめ商品情報を取得する
+            $Recommend = $app['eccube.plugin.recommend.repository.recommend_product']->find($id);
 
-            return $app->redirect($app->url('admin_recommend_list'));
-        }
+            if (!$Recommend) {
+                $app->addError('admin.recommend.not_found', 'admin');
 
-        // IDからおすすめ商品情報を取得する
-        $Recommend = $app['eccube.plugin.recommend.repository.recommend_product']->find($id);
+                return $app->redirect($app->url('admin_recommend_list'));
+            }
 
-        if (!$Recommend) {
-            $app->addError('admin.recommend.not_found', 'admin');
-
-            return $app->redirect($app->url('admin_recommend_list'));
+            $Product = $Recommend->getProduct();
         }
 
         // formの作成
@@ -113,27 +70,30 @@ class RecommendController extends AbstractController
             ->createBuilder('admin_recommend', $Recommend)
             ->getForm();
 
-        if ('POST' === $request->getMethod()) {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                $service = $app['eccube.plugin.recommend.service.recommend'];
-                $status = $service->updateRecommend($form->getData());
-
-                if (!$status) {
-                    $app->addError('admin.recommend.not_found', 'admin');
-                } else {
-                    $app->addSuccess('admin.plugin.recommend.update.success', 'admin');
-                }
-
-                return $app->redirect($app->url('admin_recommend_list'));
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $service = $app['eccube.plugin.recommend.service.recommend'];
+            $data = $form->getData();
+            if (is_null($data['id'])) {
+                $status = $service->createRecommend($data);
+            } else {
+                $status = $service->updateRecommend($data);
             }
+
+            if (!$status) {
+                $app->addError('admin.recommend.not_found', 'admin');
+            } else {
+                $app->addSuccess('admin.plugin.recommend.update.success', 'admin');
+            }
+
+            return $app->redirect($app->url('admin_recommend_list'));
         }
 
         return $this->registerView(
             $app,
             array(
                 'form' => $form->createView(),
-                'Product' => $Recommend->getProduct(),
+                'Product' => $Product,
             )
         );
     }
