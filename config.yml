@@ -5,5 +5,3 @@ service:
     - RecommendServiceProvider
 orm.path:
     - /Resource/doctrine
-migration.path:
-    - /Resource/doctrine/migration

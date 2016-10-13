@@ -42,16 +42,14 @@
         <tbody>
         {% for Product in pagination %}
             <form name="product_form{{ Product.id }}">
-                {% set form = forms[Product.id] %}
-
                 <tr>
                     <td>
                         {{ Product.name }}
-                        {% if Product.hasProductClass %}
-                            <span><br/>{{ Product.code_min }}～{{ Product.code_max }}</span>
-                        {% else %}
-                            <span><br/>{{ Product.code_min }}</span>
-                        {% endif %}
+                        <br>
+                        <span>{{ Product.code_min }}
+                            {% if Product.code_min != Product.code_max %} ～ {{ Product.code_max }}
+                            {% endif %}
+                        </span>
                     </td>
                     <td class="text-right">
                         <button onclick="fnSelectProduct($(this).parent().parent(), '{{ Product.id }}', '{{ Product.name }}', '{{ url('admin_product_product_edit', { id : Product.id }) }}', '{{ app.config.image_save_urlpath }}/{{ Product.mainFileName|no_image_product }}', '{{ Product.code_min }}', '{{ Product.code_max }}')" type="button" class="btn btn-default btn-sm">

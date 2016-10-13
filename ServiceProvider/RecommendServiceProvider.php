@@ -1,24 +1,11 @@
 <?php
 /*
- * This file is part of EC-CUBE
+ * This file is part of the Recommend Product plugin
  *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
+ * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
  *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Plugin\Recommend\ServiceProvider;
@@ -60,12 +47,12 @@ class RecommendServiceProvider implements ServiceProviderInterface
             ->bind('admin_recommend_new');
 
         // おすすめ商品の編集
-        $app->match('/'.$app["config"]["admin_route"].'/recommend/edit/{id}', '\Plugin\Recommend\Controller\RecommendController::edit')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend/{id}/edit', '\Plugin\Recommend\Controller\RecommendController::edit')
             ->value('id', null)->assert('id', '\d+|')
             ->bind('admin_recommend_edit');
 
         // おすすめ商品の削除
-        $app->match('/'.$app["config"]["admin_route"].'/recommend/delete/{id}', '\Plugin\Recommend\Controller\RecommendController::delete')
+        $app->match('/'.$app["config"]["admin_route"].'/recommend/{id}/delete', '\Plugin\Recommend\Controller\RecommendController::delete')
         ->value('id', null)->assert('id', '\d+|')
         ->bind('admin_recommend_delete');
 

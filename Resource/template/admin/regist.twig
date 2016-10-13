@@ -56,27 +56,17 @@ $(function() {
 
             },
             error: function() {
-                console.log('search product failed.');
+                alert('Search product failed.');
             }
         });
     });
 });
-
-var setModeAndSubmit = function(mode, keyname, keyid) {
-    document.form1.mode.value = mode;
-    if(keyname !== undefined && keyname !== "" && keyid !== undefined && keyid !== "") {
-        document.form1[keyname].value = keyid;
-    }
-    document.form1.submit();
-    return false;
-};
 </script>
 {% endblock javascript %}
 
 {% block main %}
 <div class="row" id="aside_wrap">
     <form role="form" name="form1" id="form1" method="post">
-    <input type="hidden" name="mode" value="">
     {{ form_widget(form._token) }}
         <div class="col-md-9">
             <div class="box accordion">
@@ -142,10 +132,8 @@ var setModeAndSubmit = function(mode, keyname, keyid) {
             </div><!-- /.box -->
             <div class="row">
                 <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 text-center btn_area">
-                    <button class="btn btn-primary btn-block btn-lg" onclick="return setModeAndSubmit('commit');">登録</button>
-                    {% if form.id is not null %}
-                        <p><a href="{{ url('admin_recommend_list') }}">戻る</a></p>
-                    {% endif %}
+                    <button class="btn btn-primary btn-block btn-lg" type="submit">登録</button>
+                    <p><a href="{{ url('admin_recommend_list') }}">戻る</a></p>
                 </div>
             </div>
 
