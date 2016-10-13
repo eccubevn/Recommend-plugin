@@ -105,7 +105,8 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
             )
         );
 
-        $this->assertContains('入力されていません。商品を追加してください。', $crawler->html());
+        $this->assertContains('入力されていません。', $crawler->html());
+        $this->assertContains('商品を追加してください。', $crawler->html());
     }
 
     /**
@@ -147,7 +148,30 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
             )
         );
 
-        $this->assertContains('入力されていません。', $crawler->html());
+        $this->assertContains('商品を追加してください。', $crawler->html());
+    }
+
+    /**
+     * testRecommendNewComment4002
+     */
+    public function testRecommendNewCommentOver()
+    {
+        $this->deleteAllRows(array('plg_recommend_product'));
+        $fake = $this->getFaker();
+        $productId = 1;
+        $editMessage = $fake->text(4200);
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_new'),
+            array('admin_recommend' => array(
+                '_token' => 'dummy',
+                'comment' => $editMessage,
+                'Product' => $productId,
+            ),
+            )
+        );
+
+        $this->assertContains('値が長すぎます。4000文字以内でなければなりません。', $crawler->html());
     }
 
     /**
@@ -177,7 +201,6 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         $this->actual = $ProductNew->getComment();
         $this->verify();
     }
-
 
     /**
      * RecommendSearchModelController
@@ -291,7 +314,17 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         $this->assertContains('パーコレーター', $productList);
     }
 
+    /**
+     * testRecommendEditShow
+     */
+    public function testRecommendEditShow()
+    {
+        $recommendId = $this->Recommend2->getId();
 
+        $crawler = $this->client->request('GET', $this->app->url('admin_recommend_edit', array('id' => $recommendId)));
+
+        $this->assertContains($this->Recommend2->getProduct()->getName(), $crawler->html());
+    }
     /**
      * testRecommendEdit
      */
@@ -323,13 +356,40 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     }
 
     /**
+     * testRecommendEditExit
+     * change from product 2 to product 1
+     */
+    public function testRecommendEditExist()
+    {
+        $fake = $this->getFaker();
+        $productId = 1;
+        //recommend of product 2
+        $recommendId = $this->Recommend2->getId();
+        $editMessage = $fake->word;
+
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_edit', array('id' => $recommendId)),
+            array(
+                'admin_recommend' => array(
+                    '_token' => 'dummy',
+                    'comment' => $editMessage,
+                    'id' => $recommendId,
+                    'Product' => $productId,
+                ),
+            )
+        );
+        $this->assertContains('この商品はすでにおすすめ商品として登録されています。', $crawler->html());
+    }
+
+    /**
      * testRecommendDelete
      */
     public function testRecommendDelete()
     {
         $productId = $this->Recommend1->getId();
         $this->client->request(
-            'POST',
+            'DELETE',
             $this->app->url('admin_recommend_delete', array('id' => $productId))
         );
         $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
