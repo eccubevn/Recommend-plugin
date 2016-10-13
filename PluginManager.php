@@ -83,6 +83,13 @@ class PluginManager extends AbstractPluginManager
         $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
         // リソースファイルの削除
         $this->removeAssets($app);
+
+        if (file_exists($app['config']['block_realdir'].'/'.$this->blockFileName.'.twig')) {
+            $this->removeBlock($app);
+        }
+
+        // ブロックの削除
+        $this->removeDataBlock($app);
     }
 
     /**
@@ -91,8 +98,9 @@ class PluginManager extends AbstractPluginManager
      */
     public function enable($config, $app)
     {
-        // ブロックへ登録
         $this->copyBlock($app);
+        // ブロックへ登録
+        $this->createDataBlock($app);
 
         $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code']);
     }
@@ -103,8 +111,9 @@ class PluginManager extends AbstractPluginManager
      */
     public function disable($config, $app)
     {
-        // ブロックの削除
         $this->removeBlock($app);
+        // ブロックの削除
+        $this->removeDataBlock($app);
     }
 
     /**
@@ -113,6 +122,12 @@ class PluginManager extends AbstractPluginManager
      */
     public function update($config, $app)
     {
+        // リソースファイルのコピー
+        $this->copyAssets($app);
+
+        $this->copyBlock($app);
+
+        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code']);
     }
 
     /**
@@ -121,13 +136,8 @@ class PluginManager extends AbstractPluginManager
      * @param $app
      * @throws \Exception
      */
-    private function copyBlock($app)
+    private function createDataBlock($app)
     {
-        // ファイルコピー
-        $file = new Filesystem();
-        // ブロックファイルをコピー
-        $file->copy($this->originBlock, $app['config']['block_realdir'].'/'.$this->blockFileName.'.twig');
-
         $em = $app['orm.em'];
         $em->getConnection()->beginTransaction();
         try {
@@ -184,11 +194,8 @@ class PluginManager extends AbstractPluginManager
      * @param $app
      * @throws \Exception
      */
-    private function removeBlock($app)
+    private function removeDataBlock($app)
     {
-        $file = new Filesystem();
-        $file->remove($app['config']['block_realdir'].'/'.$this->blockFileName.'.twig');
-
         // Blockの取得(file_nameはアプリケーションの仕組み上必ずユニーク)
         /** @var \Eccube\Entity\Block $Block */
         $Block = $app['eccube.repository.block']->findOneBy(array('file_name' => $this->blockFileName));
@@ -244,5 +251,19 @@ class PluginManager extends AbstractPluginManager
     {
         $file = new Filesystem();
         $file->remove($app['config']['plugin_html_realdir'].$this->target);
+    }
+
+    private function copyBlock($app)
+    {
+        // ファイルコピー
+        $file = new Filesystem();
+        // ブロックファイルをコピー
+        $file->copy($this->originBlock, $app['config']['block_realdir'].'/'.$this->blockFileName.'.twig');
+    }
+
+    private function removeBlock($app)
+    {
+        $file = new Filesystem();
+        $file->remove($app['config']['block_realdir'].'/'.$this->blockFileName.'.twig');
     }
 }
