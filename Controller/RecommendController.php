@@ -71,9 +71,9 @@ class RecommendController extends AbstractController
             ->getForm();
 
         $form->handleRequest($request);
+        $data = $form->getData();
         if ($form->isSubmitted() && $form->isValid()) {
             $service = $app['eccube.plugin.recommend.service.recommend'];
-            $data = $form->getData();
             if (is_null($data['id'])) {
                 if ($status = $service->createRecommend($data)) {
                     $app->addSuccess('admin.plugin.recommend.register.success', 'admin');
@@ -89,6 +89,10 @@ class RecommendController extends AbstractController
             }
 
             return $app->redirect($app->url('admin_recommend_list'));
+        }
+
+        if (!empty($data['Product'])) {
+            $Product = $data['Product'];
         }
 
         return $this->registerView(
