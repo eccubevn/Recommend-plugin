@@ -78,10 +78,18 @@
                 <div class="box-header with-arrow">
                     <h3 class="box-title"><span class="normal"><strong>{{ total_item_count }} 件</strong> が該当しました</span></h3>
                 </div><!-- /.box-header -->
+
+                {% if pagination %}
                 <div id="sortable_list_box" class="box-body no-padding sortable_list">
                     <div class="item_list">
                         <div class="table-responsive with-border">
                             <table class="table table-striped">
+                                <colgroup>
+                                    <col>
+                                    <col width="10%">
+                                    <col>
+                                    <col>
+                                </colgroup>
                                 <thead>
                                 <tr class="table_header">
                                     <th>商品画像</th>
@@ -103,7 +111,7 @@
                                         {% if RecommendProduct.Product.code_min != RecommendProduct.Product.code_max %} ～ {{ RecommendProduct.Product.code_max }}
                                         {% endif %}
                                     </td>
-                                    <td class="comment">{{ RecommendProduct.comment|raw }}</td>
+                                    <td class="comment">{{ RecommendProduct.comment|raw|nl2br }}</td>
                                     <td class="icon_edit">
                                         <div class="dropdown">
                                             <a class="dropdown-toggle" data-toggle="dropdown"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>
@@ -124,6 +132,7 @@
                         </div>
                     </div>
                 </div><!-- /.box-body -->
+                {% endif %}
             </div><!-- /.box -->
         </div><!-- /.col -->
     </div>
