@@ -60,8 +60,9 @@ class PluginManager extends AbstractPluginManager
 
         // コピー元のディレクトリ
         $this->origin = __DIR__.'/Resource/assets';
+
         // コピー先のディレクトリ
-        $this->target = '/recommend';
+        $this->target = __DIR__ . '/../../../html/plugin/recommend';
     }
 
     /**
@@ -71,7 +72,7 @@ class PluginManager extends AbstractPluginManager
     public function install($config, $app)
     {
         // リソースファイルのコピー
-        $this->copyAssets($app);
+        $this->copyAssets();
     }
 
     /**
@@ -82,7 +83,7 @@ class PluginManager extends AbstractPluginManager
     {
         $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
         // リソースファイルの削除
-        $this->removeAssets($app);
+        $this->removeAssets();
 
         if (file_exists($app['config']['block_realdir'].'/'.$this->blockFileName.'.twig')) {
             $this->removeBlock($app);
@@ -233,24 +234,20 @@ class PluginManager extends AbstractPluginManager
 
     /**
      * リソースファイル等をコピー
-     *
-     * @param $app
      */
-    private function copyAssets($app)
+    private function copyAssets()
     {
         $file = new Filesystem();
-        $file->mirror($this->origin, $app['config']['plugin_html_realdir'].$this->target.'/assets');
+        $file->mirror($this->origin, $this->target.'/assets');
     }
 
     /**
      * コピーしたリソースファイルなどを削除
-     *
-     * @param $app
      */
-    private function removeAssets($app)
+    private function removeAssets()
     {
         $file = new Filesystem();
-        $file->remove($app['config']['plugin_html_realdir'].$this->target);
+        $file->remove($this->target);
     }
 
     private function copyBlock($app)
