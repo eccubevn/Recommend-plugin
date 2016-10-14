@@ -5,3 +5,7 @@
     background-color: #3F6FAB;
     border-color: #3F6FAB;
 }
+div.warning {
+    margin-top: 20px;
+    color: #9BD5E8;
+}

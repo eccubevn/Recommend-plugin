@@ -18,36 +18,38 @@
 
 {% block javascript %}
 <script>
-$(function() {
-    $('#showSearchProductModal').on('click', function() {
-            var tbody = $('#searchProductModalList tbody');
-            tbody.children().remove();
-            $('div.box-footer').remove();
-        }
-    );
+    var recommend = '{{ recommend_products|raw }}';
 
-    $('#searchProductModalButton').on('click', function() {
-        var list = $('#searchProductModalList');
-        list.children().remove();
-        $.ajax({
-            type: 'POST',
-            dataType: 'html',
-            data: {
-                'id' : $('#admin_search_product_id').val(),
-                'category_id' : $('#admin_search_product_category_id').val()
-            },
-            url: '{{ url('admin_recommend_search_product') }}',
-            success: function(data) {
-                // モーダルに結果を書き出し.
-                $('#searchProductModalList').html(data);
-
-            },
-            error: function() {
-                alert('Search product failed.');
+    $(function() {
+        $('#showSearchProductModal').on('click', function() {
+                var tbody = $('#searchProductModalList tbody');
+                tbody.children().remove();
+                $('#pagination_wrap').remove();
             }
+        );
+
+        $('#searchProductModalButton').on('click', function() {
+            var list = $('#searchProductModalList');
+            list.children().remove();
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    'id' : $('#admin_search_product_id').val(),
+                    'category_id' : $('#admin_search_product_category_id').val()
+                },
+                url: '{{ url('admin_recommend_search_product') }}',
+                success: function(data) {
+                    // モーダルに結果を書き出し.
+                    $('#searchProductModalList').html(data);
+
+                },
+                error: function() {
+                    alert('Search product failed.');
+                }
+            });
         });
     });
-});
 </script>
 {% endblock javascript %}
 
@@ -104,6 +106,7 @@ $(function() {
                                 <a id="showSearchProductModal" class="btn btn-default btn-block btn-sm" data-toggle="modal" data-target="#searchProductModal">商品の追加</a>
                                 {{ form_widget(form.Product) }}
                                 {{ form_errors(form.Product) }}
+                                <div id="warning" class="warning"></div>
                             </div>
                         </div>
                         {# コメント #}

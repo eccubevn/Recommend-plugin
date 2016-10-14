@@ -31,8 +31,7 @@ class RecommendController extends AbstractController
      */
     public function index(Application $app, Request $request)
     {
-        $limit = $app['config']['recommend_limit'];
-        $pagination = $app['eccube.plugin.recommend.repository.recommend_product']->findBy(array(), array('rank' => 'DESC'), $limit);
+        $pagination = $app['eccube.plugin.recommend.repository.recommend_product']->findBy(array(), array('rank' => 'DESC'));
 
         return $app->render('Recommend/Resource/template/admin/index.twig', array(
             'pagination' => $pagination,
@@ -95,10 +94,13 @@ class RecommendController extends AbstractController
             $Product = $data['Product'];
         }
 
+        $arrProductIdByRecommend = $app['eccube.plugin.recommend.repository.recommend_product']->getRecommendProductIdAll();
+
         return $this->registerView(
             $app,
             array(
                 'form' => $form->createView(),
+                'recommend_products' => json_encode($arrProductIdByRecommend),
                 'Product' => $Product,
             )
         );

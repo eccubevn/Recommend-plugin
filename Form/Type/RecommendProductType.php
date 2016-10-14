@@ -80,31 +80,12 @@ class RecommendProductType extends AbstractType
             $form = $event->getForm();
             $data = $form->getData();
 
-            // Check limit of recommend
-            $number = $app['eccube.plugin.recommend.repository.recommend_product']->countRecommend();
-            if ($number >= $app['config']['recommend_limit']) {
-                $form['comment']->addError(new FormError($app->trans('plugin.recommend.type.product.limit')));
-
-                return;
-            }
-
             // Check product
             $Product = $data['Product'];
             if (empty($Product)) {
                 $form['comment']->addError(new FormError($app->trans('plugin.recommend.type.product.not_found')));
 
                 return;
-            }
-
-            // Check recommend
-            $RecommendProduct = $app['eccube.plugin.recommend.repository.recommend_product']->findOneBy(array('Product' => $Product));
-            if (empty($RecommendProduct)) {
-                return;
-            }
-
-            // Check existing Product in recommend, except itself
-            if ($RecommendProduct->getId() != $data['id']) {
-                $form['comment']->addError(new FormError($app->trans('plugin.recommend.type.product_recommend.existed')));
             }
         });
     }

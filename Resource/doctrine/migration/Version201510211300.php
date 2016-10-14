@@ -15,6 +15,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
 use Eccube\Application;
 use Eccube\Common\Constant;
+use Doctrine\ORM\EntityManager;
 
 /**
  * Class Version201510211300
@@ -150,10 +151,10 @@ class Version201510211300 extends AbstractMigration
     /**
      * Get metadata
      *
-     * @param object $em
+     * @param EntityManager $em
      * @return array
      */
-    protected function getMetadata($em)
+    protected function getMetadata(EntityManager $em)
     {
         $meta = array();
         foreach ($this->entities as $entity) {

@@ -41,7 +41,7 @@ class RecommendSearchModelController
         if ('POST' === $request->getMethod()) {
             $page_no = 1;
             $searchData = array(
-                'name' => $request->get('id'),
+                'name' => trim($request->get('id')),
             );
             if ($categoryId = $request->get('category_id')) {
                 $Category = $app['eccube.repository.category']->find($categoryId);
@@ -59,7 +59,6 @@ class RecommendSearchModelController
         }
 
         //set parameter
-        $searchData['link_status'] = 1;
         $searchData['id'] = $searchData['name'];
 
         $qb = $app['eccube.repository.product']->getQueryBuilderBySearchDataForAdmin($searchData);
