@@ -7,3 +7,4 @@ admin.plugin.recommend.delete.confirm: おすすめ情報を削除してもよ�
 plugin.recommend.type.product.not_found: 商品を追加してください。
 plugin.recommend.type.product_recommend.existed: この商品はすでにおすすめ商品として登録されています。
 plugin.recommend.type.product.limit: おすすめ商品の登録件数の上限は100件です。
+plugin.recommend.type.comment.placeholder: 説明文を入力してください(HTMLタグ使用可)。
