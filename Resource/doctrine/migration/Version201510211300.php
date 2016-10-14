@@ -150,10 +150,10 @@ class Version201510211300 extends AbstractMigration
     /**
      * Get metadata
      *
-     * @param EntityManager $em
+     * @param object $em
      * @return array
      */
-    protected function getMetadata(EntityManager $em)
+    protected function getMetadata($em)
     {
         $meta = array();
         foreach ($this->entities as $entity) {

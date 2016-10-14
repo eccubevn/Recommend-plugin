@@ -159,7 +159,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         $this->deleteAllRows(array('plg_recommend_product'));
         $fake = $this->getFaker();
         $productId = 1;
-        $editMessage = $fake->text(4200);
+        $editMessage = $fake->text(99999);
         $crawler = $this->client->request(
             'POST',
             $this->app->url('admin_recommend_new'),
