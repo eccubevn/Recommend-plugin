@@ -87,8 +87,6 @@ class RecommendServiceProvider implements ServiceProviderInterface
 
         // メッセージ登録
         $app['translator'] = $app->share($app->extend('translator', function ($translator, \Silex\Application $app) {
-            $translator->addLoader('yaml', new YamlFileLoader());
-
             $file = __DIR__.'/../Resource/locale/message.'.$app['locale'].'.yml';
             if (file_exists($file)) {
                 $translator->addResource('yaml', $file, $app['locale']);

@@ -140,7 +140,6 @@ class PluginManager extends AbstractPluginManager
     private function createDataBlock($app)
     {
         $em = $app['orm.em'];
-        $em->getConnection()->beginTransaction();
         try {
             $DeviceType = $app['eccube.repository.master.device_type']->find(DeviceType::DEVICE_TYPE_PC);
 
@@ -181,10 +180,7 @@ class PluginManager extends AbstractPluginManager
 
             $em->persist($BlockPosition);
             $em->flush();
-
-            $em->getConnection()->commit();
         } catch (\Exception $e) {
-            $em->getConnection()->rollback();
             throw $e;
         }
     }
@@ -208,8 +204,6 @@ class PluginManager extends AbstractPluginManager
         }
 
         $em = $app['orm.em'];
-        $em->getConnection()->beginTransaction();
-
         try {
             // BlockPositionの削除
             $blockPositions = $Block->getBlockPositions();
@@ -221,11 +215,8 @@ class PluginManager extends AbstractPluginManager
 
             // Blockの削除
             $em->remove($Block);
-
             $em->flush();
-            $em->getConnection()->commit();
         } catch (\Exception $e) {
-            $em->getConnection()->rollback();
             throw $e;
         }
 
