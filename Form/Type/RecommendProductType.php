@@ -53,12 +53,12 @@ class RecommendProductType extends AbstractType
 
         $builder
             ->add('id', 'text', array(
-                'label' => 'おすすめ商品ID',
+                'label' => '商品',
                 'required' => false,
                 'attr' => array('readonly' => 'readonly'),
             ))
             ->add('comment', 'textarea', array(
-                'label' => 'コメント',
+                'label' => '説明文',
                 'required' => true,
                 'trim' => true,
                 'constraints' => array(
