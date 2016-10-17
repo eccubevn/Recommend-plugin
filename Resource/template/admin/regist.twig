@@ -13,6 +13,10 @@
 {% block title %}おすすめ商品管理{% endblock %}
 {% block sub_title %}おすすめ商品内容設定{% endblock %}
 
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/../../plugin{{ app.config.recommend_assetspath }}/css/recommend.css">
+{% endblock stylesheet %}
+
 {% form_theme form 'Form/bootstrap_3_horizontal_layout.html.twig' %}
 {% form_theme searchProductModalForm 'Form/bootstrap_3_horizontal_layout.html.twig' %}
 
