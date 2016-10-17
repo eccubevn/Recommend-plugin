@@ -102,14 +102,18 @@
                                 {% for RecommendProduct in pagination %}
                                 <tr class="item_box tr" data-rank="{{ RecommendProduct.rank }}" data-recommend-id="{{ RecommendProduct.id }}">
                                     <td id="product_image" class="item_photo td">
-                                        <img src="{{ app.config.image_save_urlpath }}/{{ RecommendProduct.Product.mainFileName|no_image_product }}"/>
+                                        <a href="{{ url('admin_recommend_edit', { id : RecommendProduct.id }) }}" >
+                                            <img src="{{ app.config.image_save_urlpath }}/{{ RecommendProduct.Product.mainFileName|no_image_product }}"/>
+                                        </a>
                                     </td>
                                     <td class="product_name">
-                                        {{ RecommendProduct.Product.name }}
-                                        <br>
-                                        {{ RecommendProduct.Product.code_min }}
-                                        {% if RecommendProduct.Product.code_min != RecommendProduct.Product.code_max %} ～ {{ RecommendProduct.Product.code_max }}
-                                        {% endif %}
+                                        <a href="{{ url('admin_recommend_edit', { id : RecommendProduct.id }) }}" >
+                                            {{ RecommendProduct.Product.name }}
+                                            <br>
+                                            {{ RecommendProduct.Product.code_min }}
+                                            {% if RecommendProduct.Product.code_min != RecommendProduct.Product.code_max %} ～ {{ RecommendProduct.Product.code_max }}
+                                            {% endif %}
+                                        </a>
                                     </td>
                                     <td class="comment">{{ RecommendProduct.comment|raw|nl2br }}</td>
                                     <td class="icon_edit">
