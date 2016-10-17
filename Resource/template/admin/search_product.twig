@@ -36,7 +36,7 @@
     }
 
     // 商品検索
-    $('#pagination_wrap a').on('click', function(event) {
+    $('div.box-footer a').on('click', function(event) {
         var list = $('#searchProductModalList');
         list.children().remove();
         $.ajax({
