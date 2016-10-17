@@ -45,21 +45,6 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         $this->assertContains('0 件', $crawler->html());
     }
 
-    /**
-     * testRecommendList
-     * none recommend
-     */
-    public function testRecommendList99()
-    {
-        for ($i = 3; $i < 100; $i++) {
-            $Product = $this->createProduct();
-            $this->initRecommendData( $Product->getId(), $i);
-        }
-
-        $this->Recommend1 = $this->initRecommendData(1, 1);
-        $crawler = $this->client->request('GET', $this->app->url('admin_recommend_list'));
-        $this->assertContains('100 件', $crawler->html());
-    }
 
     /**
      * testRecommendList
@@ -67,14 +52,14 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
      */
     public function testRecommendList105()
     {
-        for ($i = 3; $i < 106; $i++) {
+        $this->deleteAllRows(array('plg_recommend_product'));
+        for ($i = 1; $i < 106; $i++) {
             $Product = $this->createProduct();
             $this->initRecommendData( $Product->getId(), $i);
         }
 
-        $this->Recommend1 = $this->initRecommendData(1, 1);
         $crawler = $this->client->request('GET', $this->app->url('admin_recommend_list'));
-        $this->assertContains('100 件', $crawler->html());
+        $this->assertContains('105 件', $crawler->html());
     }
 
 
@@ -223,6 +208,52 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     /**
      * RecommendSearchModelController
      */
+    public function testAjaxSearchPublicProduct()
+    {
+        $Disp = $this->app['orm.em']->getRepository('Eccube\Entity\Master\Disp')->find(1);
+        $Product = $this->app['eccube.repository.product']->findOneBy(array('name' => 'ディナーフォーク'));
+        $Product->setStatus($Disp);
+        $this->app['orm.em']->persist($Product);
+        $this->app['orm.em']->flush($Product);
+
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_search_product', array( 'id' => '', 'category_id' => '', '_token' => 'dummy', )),
+            array(),
+            array(),
+            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
+        );
+
+        $productList = $crawler->html();
+        $this->assertContains('ディナーフォーク', $productList);
+    }
+
+    /**
+     * RecommendSearchModelController
+     */
+    public function testAjaxSearchUnpublicProduct()
+    {
+        $Disp = $this->app['orm.em']->getRepository('Eccube\Entity\Master\Disp')->find(2);
+        $Product = $this->app['eccube.repository.product']->findOneBy(array('name' => 'ディナーフォーク'));
+        $Product->setStatus($Disp);
+        $this->app['orm.em']->persist($Product);
+        $this->app['orm.em']->flush($Product);
+
+        $crawler = $this->client->request(
+            'POST',
+            $this->app->url('admin_recommend_search_product', array( 'id' => '', 'category_id' => '', '_token' => 'dummy', )),
+            array(),
+            array(),
+            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
+        );
+
+        $productList = $crawler->html();
+        $this->assertContains('ディナーフォーク', $productList);
+    }
+
+    /**
+     * RecommendSearchModelController
+     */
     public function testAjaxSearchProductValue()
     {
         $crawler = $this->client->request(
@@ -354,7 +385,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
                 ),
             )
         );
-        $this->assertContains('この商品はすでにおすすめ商品として登録されています。', $crawler->html());
+        $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
     }
 
     /**
