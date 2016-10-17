@@ -119,4 +119,18 @@ class RecommendProductRepository extends EntityRepository
 
         return true;
     }
+
+    /**
+     * Get all id of recommend product
+     * @return array
+     */
+    public function getRecommendProductIdAll()
+    {
+        $query = $this->createQueryBuilder('rp')
+            ->select('IDENTITY(rp.Product) as id')
+            ->getQuery();
+        $arrReturn = $query->getScalarResult();
+
+        return array_map('current', $arrReturn);
+    }
 }
