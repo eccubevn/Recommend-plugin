@@ -13,10 +13,6 @@
 {% block title %}おすすめ商品管理{% endblock %}
 {% block sub_title %}おすすめ商品内容設定{% endblock %}
 
-{% block stylesheet %}
-    <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/../../plugin{{ app.config.recommend_assetspath }}/css/recommend.css">
-{% endblock stylesheet %}
-
 {% form_theme form 'Form/bootstrap_3_horizontal_layout.html.twig' %}
 {% form_theme searchProductModalForm 'Form/bootstrap_3_horizontal_layout.html.twig' %}
 
@@ -83,34 +79,34 @@
                                 {% if Product is not null %}
                                     <div id="product_image">
                                         <a href="{{ url('admin_product_product_edit', { id : Product.id }) }}" id="product_image_link">
-                                            <img src="{{ app.config.image_save_urlpath }}/{{ Product.mainFileName|no_image_product }}" style="max-width: 200px;" id="product_image_img"/>
+                                            <img src="{{ app.config.image_save_urlpath }}/{{ Product.mainFileName|no_image_product }}" style="max-width: 135px;" id="product_image_img"/>
                                         </a>
                                     </div>
                                     <br>
-                                    <span id="product_name">
+                                    <p id="product_name">
                                         {{ Product.name }}
-                                    </span>
+                                    </p>
                                     <br>
-                                    <span id="product_code">
+                                    <p id="product_code">
                                         {{ Product.code_min }}
                                         {% if Product.code_min != Product.code_max %} ～ {{ Product.code_max }}
                                         {% endif %}
-                                    </span>
+                                    </p>
                                 {% else %}
                                     <div id="product_image" class="hidden">
                                         <a href="" id="product_image_link">
-                                            <img src="" style="max-width: 200px;" id="product_image_img"/>
+                                            <img src="" style="max-width: 135px;" id="product_image_img"/>
                                         </a>
                                     </div>
-                                    <br>
-                                    <span id="product_name" class="hidden"></span>
-                                    <br>
-                                    <span id="product_code" class="hidden"></span>
+                                    <p id="product_name" class="hidden"></p>
+                                    <p id="product_code" class="hidden"></p>
                                 {% endif %}
-                                <a id="showSearchProductModal" class="btn btn-default btn-block btn-sm" data-toggle="modal" data-target="#searchProductModal">商品の追加</a>
+                                <div class="row col-sm-3 col-lg-3">
+                                    <a id="showSearchProductModal" class="btn btn-default btn-block btn-sm" data-toggle="modal" data-target="#searchProductModal">商品の追加</a>
+                                </div>
                                 {{ form_widget(form.Product) }}
                                 {{ form_errors(form.Product) }}
-                                <div id="warning" class="warning"></div>
+                                <div id="warning" class="text-info"></div>
                             </div>
                         </div>
                         {# コメント #}

@@ -71,8 +71,6 @@ class PluginManager extends AbstractPluginManager
      */
     public function install($config, $app)
     {
-        // リソースファイルのコピー
-        $this->copyAssets();
     }
 
     /**
@@ -82,8 +80,6 @@ class PluginManager extends AbstractPluginManager
     public function uninstall($config, $app)
     {
         $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
-        // リソースファイルの削除
-        $this->removeAssets();
 
         if (file_exists($app['config']['block_realdir'].'/'.$this->blockFileName.'.twig')) {
             $this->removeBlock($app);
@@ -123,9 +119,6 @@ class PluginManager extends AbstractPluginManager
      */
     public function update($config, $app)
     {
-        // リソースファイルのコピー
-        $this->copyAssets($app);
-
         $this->copyBlock($app);
 
         $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code']);
@@ -221,24 +214,6 @@ class PluginManager extends AbstractPluginManager
         }
 
         Cache::clear($app, false);
-    }
-
-    /**
-     * リソースファイル等をコピー
-     */
-    private function copyAssets()
-    {
-        $file = new Filesystem();
-        $file->mirror($this->origin, $this->target.'/assets');
-    }
-
-    /**
-     * コピーしたリソースファイルなどを削除
-     */
-    private function removeAssets()
-    {
-        $file = new Filesystem();
-        $file->remove($this->target);
     }
 
     private function copyBlock($app)
