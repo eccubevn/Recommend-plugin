@@ -16,10 +16,9 @@ use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Plugin\Recommend\Form\Type\RecommendProductType;
 use Plugin\Recommend\Service\RecommendService;
-use Plugin\Recommend\Twig\Extension\FilterBlackListedExtension;
 use Silex\Application as BaseApplication;
+use Silex\Application;
 use Silex\ServiceProviderInterface;
-use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -86,7 +85,7 @@ class RecommendServiceProvider implements ServiceProviderInterface
         });
 
         // メッセージ登録
-        $app['translator'] = $app->share($app->extend('translator', function ($translator, \Silex\Application $app) {
+        $app['translator'] = $app->share($app->extend('translator', function ($translator, Application $app) {
             $file = __DIR__.'/../Resource/locale/message.'.$app['locale'].'.yml';
             if (file_exists($file)) {
                 $translator->addResource('yaml', $file, $app['locale']);

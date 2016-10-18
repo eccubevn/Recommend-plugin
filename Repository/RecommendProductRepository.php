@@ -11,7 +11,6 @@
 namespace Plugin\Recommend\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\NoResultException;
 use Eccube\Entity\Master\Disp;
 use Plugin\Recommend\Entity\RecommendProduct;
 

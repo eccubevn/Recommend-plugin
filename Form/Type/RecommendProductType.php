@@ -27,7 +27,7 @@ class RecommendProductType extends AbstractType
 {
 
     /**
-     * @var \Silex\Application
+     * @var \Eccube\Application
      */
     private $app;
 

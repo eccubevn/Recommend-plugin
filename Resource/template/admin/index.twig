@@ -33,7 +33,7 @@
             $("div.item_list .item_box").each(function() {
                 oldRanks.push(this.dataset.rank);
             });
-            // rsort
+            // reverse sort
             oldRanks.sort(function(a,b){return a - b;}).reverse();
 
             $("div.item_list").sortable({

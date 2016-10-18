@@ -67,7 +67,7 @@ class PluginManager extends AbstractPluginManager
 
     /**
      * @param array  $config
-     * @param object $app
+     * @param \Eccube\Application $app
      */
     public function install($config, $app)
     {
@@ -95,7 +95,7 @@ class PluginManager extends AbstractPluginManager
 
     /**
      * @param array  $config
-     * @param object $app
+     * @param \Eccube\Application $app
      */
     public function enable($config, $app)
     {
@@ -108,7 +108,7 @@ class PluginManager extends AbstractPluginManager
 
     /**
      * @param array  $config
-     * @param object $app
+     * @param \Eccube\Application $app
      */
     public function disable($config, $app)
     {
@@ -124,7 +124,7 @@ class PluginManager extends AbstractPluginManager
     public function update($config, $app)
     {
         // リソースファイルのコピー
-        $this->copyAssets($app);
+        $this->copyAssets();
 
         $this->copyBlock($app);
 
@@ -134,7 +134,7 @@ class PluginManager extends AbstractPluginManager
     /**
      * ブロックを登録
      *
-     * @param $app
+     * @param \Eccube\Application $app
      * @throws \Exception
      */
     private function createDataBlock($app)
@@ -188,7 +188,7 @@ class PluginManager extends AbstractPluginManager
     /**
      * ブロックを削除
      *
-     * @param $app
+     * @param \Eccube\Application $app
      * @throws \Exception
      */
     private function removeDataBlock($app)
