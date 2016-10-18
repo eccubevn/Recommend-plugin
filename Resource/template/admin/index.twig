@@ -18,7 +18,24 @@
 {% block sub_title %}おすすめ商品内容設定{% endblock %}
 
 {% block stylesheet %}
-    <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/../../plugin{{ app.config.recommend_assetspath }}/css/recommend.css">
+    <style type="text/css">
+        .item_list .item_box .item_photo {
+            padding-left: 0px;
+        }
+        .sortable_list .icon_sortable {
+            top: initial;
+            position: relative;
+            margin: auto;
+            vertical-align: middle;
+        }
+        .table_list tr > th, .table_list tr > td {
+             border-left: none;
+        }
+        .ui-sortable-helper {
+            display: table;
+        }
+    </style>
+
 {% endblock stylesheet %}
 
 {% block javascript %}
@@ -53,8 +70,6 @@
                     newRanks[this.dataset.recommendId] = oldRanks[i];
                     i++;
                 });
-                // token
-                {#newRanks["{{ constant('Eccube\\Common\\Constant::TOKEN_NAME') }}"] = '{{ csrf_token("authenticate") }}';#}
                 $.ajax({
                     url: '{{ url('admin_recommend_rank_move') }}',
                     type: 'POST',
@@ -80,59 +95,67 @@
                 </div><!-- /.box-header -->
 
                 {% if pagination %}
-                <div id="sortable_list_box" class="box-body no-padding sortable_list">
-                    <div class="item_list">
-                        <div class="table-responsive with-border">
-                            <table class="table table-striped">
-                                <colgroup>
-                                    <col>
-                                    <col width="10%">
-                                    <col>
-                                    <col>
-                                </colgroup>
-                                <thead>
-                                <tr class="table_header">
-                                    <th>商品画像</th>
-                                    <th>商品名</th>
-                                    <th>説明文</th>
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for RecommendProduct in pagination %}
-                                <tr class="item_box tr" data-rank="{{ RecommendProduct.rank }}" data-recommend-id="{{ RecommendProduct.id }}">
-                                    <td id="product_image" class="item_photo td">
-                                        <a href="{{ url('admin_recommend_edit', { id : RecommendProduct.id }) }}" >
-                                            <img src="{{ app.config.image_save_urlpath }}/{{ RecommendProduct.Product.mainFileName|no_image_product }}"/>
-                                        </a>
-                                    </td>
-                                    <td class="product_name">
-                                        <a href="{{ url('admin_recommend_edit', { id : RecommendProduct.id }) }}" >
-                                            {{ RecommendProduct.Product.name }}
-                                            <br>
-                                            {{ RecommendProduct.Product.code_min }}
-                                            {% if RecommendProduct.Product.code_min != RecommendProduct.Product.code_max %} ～ {{ RecommendProduct.Product.code_max }}
-                                            {% endif %}
-                                        </a>
-                                    </td>
-                                    <td class="comment">{{ RecommendProduct.comment|raw|nl2br }}</td>
-                                    <td class="icon_edit">
-                                        <div class="dropdown">
-                                            <a class="dropdown-toggle" data-toggle="dropdown"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>
-                                            <ul class="dropdown-menu dropdown-menu-right">
-                                                <li>
-                                                    <a href="{{ url('admin_recommend_edit', { id : RecommendProduct.id }) }}" >編集</a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{ url('admin_recommend_delete', {'id' : RecommendProduct.id}) }}" {{ csrf_token_for_anchor() }} data-method="delete" data-message="{{ 'admin.plugin.recommend.delete.confirm'|trans }}">削除</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                               </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
+                <div id="sortable_list_box" class="box-body no-padding no-border">
+                    <div class="sortable_list">
+                        <div class="item_list">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <colgroup>
+                                        <col width="2%">
+                                        <col>
+                                        <col width="10%">
+                                        <col>
+                                        <col width="5%">
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>商品画像</th>
+                                            <th>商品名</th>
+                                            <th>説明文</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for RecommendProduct in pagination %}
+                                    <tr class="item_box tr" data-rank="{{ RecommendProduct.rank }}" data-recommend-id="{{ RecommendProduct.id }}">
+                                            <td class="icon_sortable td">
+                                                <svg class="cb cb-ellipsis-v"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cb-ellipsis-v"></use></svg>
+                                            </td>
+                                        <td id="product_image" class="item_photo td">
+
+                                            <a href="{{ url('admin_recommend_edit', { id : RecommendProduct.id }) }}" >
+                                                <img src="{{ app.config.image_save_urlpath }}/{{ RecommendProduct.Product.mainFileName|no_image_product }}"/>
+                                            </a>
+                                        </td>
+                                        <td class="product_name">
+                                            <a href="{{ url('admin_recommend_edit', { id : RecommendProduct.id }) }}" >
+                                                {{ RecommendProduct.Product.name }}
+                                                <br>
+                                                {{ RecommendProduct.Product.code_min }}
+                                                {% if RecommendProduct.Product.code_min != RecommendProduct.Product.code_max %} ～ {{ RecommendProduct.Product.code_max }}
+                                                {% endif %}
+                                            </a>
+                                        </td>
+                                        <td class="comment">{{ RecommendProduct.comment|raw|nl2br }}</td>
+                                        <td class="icon_edit">
+                                            <div class="dropdown">
+                                                <a class="dropdown-toggle" data-toggle="dropdown"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>
+                                                <ul class="dropdown-menu dropdown-menu-right">
+                                                    <li>
+                                                        <a href="{{ url('admin_recommend_edit', { id : RecommendProduct.id }) }}" >編集</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('admin_recommend_delete', {'id' : RecommendProduct.id}) }}" {{ csrf_token_for_anchor() }} data-method="delete" data-message="{{ 'admin.plugin.recommend.delete.confirm'|trans }}">削除</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                   </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div><!-- /.box-body -->
