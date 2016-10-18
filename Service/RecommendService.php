@@ -11,6 +11,7 @@
 namespace Plugin\Recommend\Service;
 
 use Eccube\Common\Constant;
+use Plugin\Recommend\Entity\RecommendProduct;
 
 /**
  * Class RecommendService
@@ -27,7 +28,7 @@ class RecommendService
     /**
      * コンストラクタ
      *
-     * @param object $app
+     * @param \Eccube\Application $app
      */
     public function __construct($app)
     {
@@ -57,8 +58,6 @@ class RecommendService
      */
     public function updateRecommend($data)
     {
-        $dateTime = new \DateTime();
-
         // おすすめ商品情報を取得する
         $Recommend = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($data['id']);
         if(!$Recommend) {
@@ -81,8 +80,6 @@ class RecommendService
      */
     public function deleteRecommend($recommendId)
     {
-        $currentDateTime = new \DateTime();
-
         // おすすめ商品情報を取得する
         $Recommend =$this->app['eccube.plugin.recommend.repository.recommend_product']->find($recommendId);
         if(!$Recommend) {
@@ -99,7 +96,7 @@ class RecommendService
      * おすすめ商品情報を生成する
      *
      * @param array $data
-     * @return \Plugin\Recommend\Entity\RecommendProduct
+     * @return RecommendProduct
      */
     protected function newRecommend($data)
     {
@@ -107,7 +104,7 @@ class RecommendService
 
         $rank = $this->app['eccube.plugin.recommend.repository.recommend_product']->getMaxRank();
 
-        $Recommend = new \Plugin\Recommend\Entity\RecommendProduct();
+        $Recommend = new RecommendProduct();
         $Recommend->setComment($data['comment']);
         $Recommend->setProduct($data['Product']);
         $Recommend->setRank(($rank ? $rank : 0) + 1);
