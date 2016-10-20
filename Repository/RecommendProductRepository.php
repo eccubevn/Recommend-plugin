@@ -121,6 +121,7 @@ class RecommendProductRepository extends EntityRepository
 
     /**
      * Get all id of recommend product
+     *
      * @return array
      */
     public function getRecommendProductIdAll()

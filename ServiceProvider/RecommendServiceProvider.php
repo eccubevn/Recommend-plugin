@@ -10,10 +10,6 @@
 
 namespace Plugin\Recommend\ServiceProvider;
 
-use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
-use Monolog\Handler\FingersCrossedHandler;
-use Monolog\Handler\RotatingFileHandler;
-use Monolog\Logger;
 use Plugin\Recommend\Form\Type\RecommendProductType;
 use Plugin\Recommend\Service\RecommendService;
 use Silex\Application as BaseApplication;
@@ -94,7 +90,7 @@ class RecommendServiceProvider implements ServiceProviderInterface
             return $translator;
         }));
 
-        // メニュー登録
+        // Config
         $app['config'] = $app->share($app->extend('config', function ($config) {
             // menu bar
             $addNavi['id'] = 'admin_recommend';
@@ -130,29 +126,6 @@ class RecommendServiceProvider implements ServiceProviderInterface
 
             return $config;
         }));
-
-        // ログファイル設定
-        $app['monolog.Recommend'] = $app->share(function ($app) {
-            $loggerClass = $app['monolog.logger.class'];
-            $loggerName = 'plugin.Recommend';
-            $logger = new $loggerClass($loggerName);
-
-            $file = $app['config']['root_dir'].'/app/log/Recommend.log';
-            $rotateHandler = new RotatingFileHandler($file, $app['config']['log']['max_files'], Logger::INFO);
-            $rotateHandler->setFilenameFormat(
-                'Recommend_{date}',
-                'Y-m-d'
-            );
-
-            $logger->pushHandler(
-                new FingersCrossedHandler(
-                    $rotateHandler,
-                    new ErrorLevelActivationStrategy(Logger::INFO)
-                )
-            );
-
-            return $logger;
-        });
     }
 
     /**

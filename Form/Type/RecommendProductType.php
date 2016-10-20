@@ -69,7 +69,8 @@ class RecommendProductType extends AbstractType
                 ),
                 'attr' => array(
                     'maxlength' => $app['config']['text_area_len'],
-                    'placeholder' => $app->trans('plugin.recommend.type.comment.placeholder')),
+                    'placeholder' => $app->trans('plugin.recommend.type.comment.placeholder'),
+                ),
             ));
 
         $builder->add(

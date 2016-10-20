@@ -41,32 +41,16 @@ class PluginManager extends AbstractPluginManager
     private $blockFileName = 'recommend_product_block';
 
     /**
-     * @var string コピー元リソースディレクトリ
-     */
-    private $origin;
-
-    /**
-     * @var string コピー先リソースディレクトリ
-     */
-    private $target;
-
-    /**
      * PluginManager constructor.
      */
     public function __construct()
     {
         // コピー元ブロックファイル
         $this->originBlock = __DIR__.'/Resource/template/Block/'.$this->blockFileName.'.twig';
-
-        // コピー元のディレクトリ
-        $this->origin = __DIR__.'/Resource/assets';
-
-        // コピー先のディレクトリ
-        $this->target = __DIR__ . '/../../../html/plugin/recommend';
     }
 
     /**
-     * @param array  $config
+     * @param array               $config
      * @param \Eccube\Application $app
      */
     public function install($config, $app)
@@ -74,23 +58,23 @@ class PluginManager extends AbstractPluginManager
     }
 
     /**
-     * @param array  $config
-     * @param object $app
+     * @param array               $config
+     * @param \Eccube\Application $app
      */
     public function uninstall($config, $app)
     {
-        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
+        // ブロックの削除
+        $this->removeDataBlock($app);
 
         if (file_exists($app['config']['block_realdir'].'/'.$this->blockFileName.'.twig')) {
             $this->removeBlock($app);
         }
 
-        // ブロックの削除
-        $this->removeDataBlock($app);
+        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
     }
 
     /**
-     * @param array  $config
+     * @param array               $config
      * @param \Eccube\Application $app
      */
     public function enable($config, $app)
@@ -103,7 +87,7 @@ class PluginManager extends AbstractPluginManager
     }
 
     /**
-     * @param array  $config
+     * @param array               $config
      * @param \Eccube\Application $app
      */
     public function disable($config, $app)
@@ -114,8 +98,8 @@ class PluginManager extends AbstractPluginManager
     }
 
     /**
-     * @param array  $config
-     * @param object $app
+     * @param array               $config
+     * @param \Eccube\Application $app
      */
     public function update($config, $app)
     {
@@ -145,7 +129,7 @@ class PluginManager extends AbstractPluginManager
                 ->setDeletableFlg(Constant::DISABLED)
                 ->setLogicFlg(1);
             $em->persist($Block);
-            $em->flush();
+            $em->flush($Block);
 
             // BlockPositionの登録
             $blockPos = $em->getRepository('Eccube\Entity\BlockPosition')->findOneBy(
@@ -172,7 +156,7 @@ class PluginManager extends AbstractPluginManager
                 ->setAnywhere(Constant::ENABLED);
 
             $em->persist($BlockPosition);
-            $em->flush();
+            $em->flush($BlockPosition);
         } catch (\Exception $e) {
             throw $e;
         }
@@ -216,6 +200,11 @@ class PluginManager extends AbstractPluginManager
         Cache::clear($app, false);
     }
 
+    /**
+     * Copy block template
+     *
+     * @param $app
+     */
     private function copyBlock($app)
     {
         // ファイルコピー
@@ -224,6 +213,11 @@ class PluginManager extends AbstractPluginManager
         $file->copy($this->originBlock, $app['config']['block_realdir'].'/'.$this->blockFileName.'.twig');
     }
 
+    /**
+     * Remove block template
+     *
+     * @param $app
+     */
     private function removeBlock($app)
     {
         $file = new Filesystem();

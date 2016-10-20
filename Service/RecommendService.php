@@ -22,9 +22,6 @@ class RecommendService
     /** @var \Eccube\Application */
     public $app;
 
-    /** @var \Eccube\Entity\BaseInfo */
-    public $BaseInfo;
-
     /**
      * コンストラクタ
      *
@@ -33,7 +30,6 @@ class RecommendService
     public function __construct($app)
     {
         $this->app = $app;
-        $this->BaseInfo = $app['eccube.repository.base_info']->get();
     }
 
     /**
@@ -100,8 +96,6 @@ class RecommendService
      */
     protected function newRecommend($data)
     {
-        $dateTime = new \DateTime();
-
         $rank = $this->app['eccube.plugin.recommend.repository.recommend_product']->getMaxRank();
 
         $Recommend = new RecommendProduct();
@@ -109,8 +103,6 @@ class RecommendService
         $Recommend->setProduct($data['Product']);
         $Recommend->setRank(($rank ? $rank : 0) + 1);
         $Recommend->setDelFlg(Constant::DISABLED);
-        $Recommend->setCreateDate($dateTime);
-        $Recommend->setUpdateDate($dateTime);
 
         return $Recommend;
     }
