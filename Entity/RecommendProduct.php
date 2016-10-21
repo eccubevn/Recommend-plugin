@@ -15,48 +15,41 @@ use Eccube\Entity\Product;
 use Eccube\Util\EntityUtil;
 
 /**
- * RecommendProduct
+ * RecommendProduct.
  */
 class RecommendProduct extends AbstractEntity
 {
     /**
-     *
-     * @var integer
+     * @var int
      */
     private $id;
 
     /**
-     *
      * @var string
      */
     private $comment;
 
     /**
-     *
-     * @var integer
+     * @var int
      */
     private $rank;
 
     /**
-     *
-     * @var integer
+     * @var int
      */
     private $status;
 
     /**
-     *
-     * @var integer
+     * @var int
      */
     private $del_flg;
 
     /**
-     *
      * @var \DateTime
      */
     private $create_date;
 
     /**
-     *
      * @var \DateTime
      */
     private $update_date;
@@ -67,16 +60,16 @@ class RecommendProduct extends AbstractEntity
     private $Product;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {
     }
 
     /**
-     * Get recommend product id
+     * Get recommend product id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -84,9 +77,10 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Set recommend product id
+     * Set recommend product id.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return $this
      */
     public function setId($id)
@@ -97,7 +91,7 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Get commend
+     * Get commend.
      *
      * @return string
      */
@@ -107,9 +101,10 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Set comment
+     * Set comment.
      *
      * @param string $comment
+     *
      * @return $this
      */
     public function setComment($comment)
@@ -120,9 +115,9 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Get rank
+     * Get rank.
      *
-     * @return integer
+     * @return int
      */
     public function getRank()
     {
@@ -130,9 +125,10 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Set rank
+     * Set rank.
      *
-     * @param integer $rank
+     * @param int $rank
+     *
      * @return $this
      */
     public function setRank($rank)
@@ -143,9 +139,10 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Set del_flg
+     * Set del_flg.
      *
-     * @param integer $delFlg
+     * @param int $delFlg
+     *
      * @return $this
      */
     public function setDelFlg($delFlg)
@@ -156,9 +153,9 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Get del_flg
+     * Get del_flg.
      *
-     * @return integer
+     * @return int
      */
     public function getDelFlg()
     {
@@ -166,9 +163,10 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Set create_date
+     * Set create_date.
      *
      * @param \DateTime $createDate
+     *
      * @return $this
      */
     public function setCreateDate($createDate)
@@ -179,7 +177,7 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Get create_date
+     * Get create_date.
      *
      * @return \DateTime
      */
@@ -189,9 +187,10 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Set update_date
+     * Set update_date.
      *
      * @param \DateTime $updateDate
+     *
      * @return $this
      */
     public function setUpdateDate($updateDate)
@@ -202,7 +201,7 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Get update_date
+     * Get update_date.
      *
      * @return \DateTime
      */
@@ -212,7 +211,7 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Set Product
+     * Set Product.
      *
      * @param \Eccube\Entity\Product $Product
      *
@@ -226,7 +225,7 @@ class RecommendProduct extends AbstractEntity
     }
 
     /**
-     * Get Product
+     * Get Product.
      *
      * @return \Eccube\Entity\Product|null
      */

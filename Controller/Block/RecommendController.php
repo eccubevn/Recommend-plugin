@@ -16,15 +16,15 @@ use Eccube\Entity\Master\Disp;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class RecommendController
- * @package Plugin\Recommend\Controller\Block
+ * Class RecommendController.
  */
 class RecommendController
 {
     /**
-     * Load block
+     * Load block.
      *
      * @param Application $app
+     *
      * @return Response
      */
     public function index(Application $app)

@@ -14,8 +14,7 @@ use Eccube\Common\Constant;
 use Plugin\Recommend\Entity\RecommendProduct;
 
 /**
- * Class RecommendService
- * @package Plugin\Recommend\Service
+ * Class RecommendService.
  */
 class RecommendService
 {
@@ -33,9 +32,10 @@ class RecommendService
     }
 
     /**
-     * おすすめ商品情報を新規登録する
+     * おすすめ商品情報を新規登録する.
      *
      * @param array $data
+     *
      * @return bool
      */
     public function createRecommend($data)
@@ -47,16 +47,17 @@ class RecommendService
     }
 
     /**
-     * おすすめ商品情報を更新する
+     * おすすめ商品情報を更新する.
      *
      * @param array $data
+     *
      * @return bool
      */
     public function updateRecommend($data)
     {
         // おすすめ商品情報を取得する
         $Recommend = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($data['id']);
-        if(!$Recommend) {
+        if (!$Recommend) {
             return false;
         }
 
@@ -69,16 +70,17 @@ class RecommendService
     }
 
     /**
-     * おすすめ商品情報を削除する
+     * おすすめ商品情報を削除する.
      *
-     * @param integer $recommendId
+     * @param int $recommendId
+     *
      * @return bool
      */
     public function deleteRecommend($recommendId)
     {
         // おすすめ商品情報を取得する
-        $Recommend =$this->app['eccube.plugin.recommend.repository.recommend_product']->find($recommendId);
-        if(!$Recommend) {
+        $Recommend = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($recommendId);
+        if (!$Recommend) {
             return false;
         }
         // おすすめ商品情報を書き換える
@@ -89,9 +91,10 @@ class RecommendService
     }
 
     /**
-     * おすすめ商品情報を生成する
+     * おすすめ商品情報を生成する.
      *
      * @param array $data
+     *
      * @return RecommendProduct
      */
     protected function newRecommend($data)

@@ -13,20 +13,19 @@ namespace Plugin\Recommend\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Eccube\Application;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception as HttpException;
 
 /**
- * Class RecommendSearchModelController
- * @package Plugin\Recommend\Controller
+ * Class RecommendSearchModelController.
  */
 class RecommendSearchModelController
 {
     /**
-     * 商品検索画面を表示する
+     * 商品検索画面を表示する.
      *
      * @param Application $app
      * @param Request     $request
-     * @param integer     $page_no
+     * @param int         $page_no
+     *
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
     public function searchProduct(Application $app, Request $request, $page_no = null)
@@ -50,7 +49,7 @@ class RecommendSearchModelController
             $session->set('eccube.plugin.recommend.product.search', $searchData);
             $session->set('eccube.plugin.recommend.product.search.page_no', $page_no);
         } else {
-            $searchData = (array)$session->get('eccube.plugin.recommend.product.search');
+            $searchData = (array) $session->get('eccube.plugin.recommend.product.search');
             if (is_null($page_no)) {
                 $page_no = intval($session->get('eccube.plugin.recommend.product.search.page_no'));
             } else {
