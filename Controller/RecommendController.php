@@ -17,16 +17,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * Class RecommendController
- * @package Plugin\Recommend\Controller
+ * Class RecommendController.
  */
 class RecommendController extends AbstractController
 {
     /**
-     * おすすめ商品一覧
+     * おすすめ商品一覧.
      *
      * @param Application $app
      * @param Request     $request
+     *
      * @return Response
      */
     public function index(Application $app, Request $request)
@@ -40,11 +40,12 @@ class RecommendController extends AbstractController
     }
 
     /**
-     * Create & Edit
+     * Create & Edit.
      *
      * @param Application $app
      * @param Request     $request
-     * @param integer     $id
+     * @param int         $id
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function edit(Application $app, Request $request, $id = null)
@@ -107,12 +108,14 @@ class RecommendController extends AbstractController
     }
 
     /**
-     * おすすめ商品の削除
+     * おすすめ商品の削除.
      *
      * @param Application $app
      * @param Request     $request
-     * @param integer     $id
+     * @param int         $id
+     *
      * @throws BadRequestHttpException
+     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function delete(Application $app, Request $request, $id)
@@ -145,10 +148,11 @@ class RecommendController extends AbstractController
     }
 
     /**
-     * Move rank with ajax
+     * Move rank with ajax.
      *
      * @param Application $app
      * @param Request     $request
+     *
      * @return bool
      */
     public function moveRank(Application $app, Request $request)
@@ -162,10 +166,11 @@ class RecommendController extends AbstractController
     }
 
     /**
-     * 編集画面用のrender
+     * 編集画面用のrender.
      *
      * @param Application $app
-     * @param array $parameters
+     * @param array       $parameters
+     *
      * @return Response
      */
     protected function registerView($app, $parameters = array())

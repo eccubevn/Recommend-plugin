@@ -18,8 +18,7 @@ use Silex\ServiceProviderInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Class RecommendServiceProvider
- * @package Plugin\Recommend\ServiceProvider
+ * Class RecommendServiceProvider.
  */
 class RecommendServiceProvider implements ServiceProviderInterface
 {
@@ -34,33 +33,33 @@ class RecommendServiceProvider implements ServiceProviderInterface
         });
 
         // おすすめ商品の一覧
-        $app->match('/'.$app["config"]["admin_route"].'/recommend', '\Plugin\Recommend\Controller\RecommendController::index')
+        $app->match('/'.$app['config']['admin_route'].'/recommend', '\Plugin\Recommend\Controller\RecommendController::index')
             ->bind('admin_recommend_list');
 
         // おすすめ商品の新規先
-        $app->match('/'.$app["config"]["admin_route"].'/recommend/new', '\Plugin\Recommend\Controller\RecommendController::edit')
+        $app->match('/'.$app['config']['admin_route'].'/recommend/new', '\Plugin\Recommend\Controller\RecommendController::edit')
             ->value('id', null)->assert('id', '\d+|')
             ->bind('admin_recommend_new');
 
         // おすすめ商品の編集
-        $app->match('/'.$app["config"]["admin_route"].'/recommend/{id}/edit', '\Plugin\Recommend\Controller\RecommendController::edit')
+        $app->match('/'.$app['config']['admin_route'].'/recommend/{id}/edit', '\Plugin\Recommend\Controller\RecommendController::edit')
             ->value('id', null)->assert('id', '\d+|')
             ->bind('admin_recommend_edit');
 
         // おすすめ商品の削除
-        $app->delete('/'.$app["config"]["admin_route"].'/recommend/{id}/delete', '\Plugin\Recommend\Controller\RecommendController::delete')
+        $app->delete('/'.$app['config']['admin_route'].'/recommend/{id}/delete', '\Plugin\Recommend\Controller\RecommendController::delete')
         ->value('id', null)->assert('id', '\d+|')
         ->bind('admin_recommend_delete');
 
         // move rank
-        $app->post('/'.$app["config"]["admin_route"].'/recommend/rank/move', '\Plugin\Recommend\Controller\RecommendController::moveRank')
+        $app->post('/'.$app['config']['admin_route'].'/recommend/rank/move', '\Plugin\Recommend\Controller\RecommendController::moveRank')
             ->bind('admin_recommend_rank_move');
 
         // 商品検索画面表示
-        $app->post('/'.$app["config"]["admin_route"].'/recommend/search/product', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')
+        $app->post('/'.$app['config']['admin_route'].'/recommend/search/product', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')
             ->bind('admin_recommend_search_product');
 
-        $app->match('/'.$app["config"]["admin_route"].'/recommend/search/product/page/{page_no}', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')
+        $app->match('/'.$app['config']['admin_route'].'/recommend/search/product/page/{page_no}', '\Plugin\Recommend\Controller\RecommendSearchModelController::searchProduct')
             ->assert('page_no', '\d+')
             ->bind('admin_recommend_search_product_page');
 

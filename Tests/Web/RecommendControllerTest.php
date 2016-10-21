@@ -12,16 +12,14 @@ namespace Plugin\Recommend\Tests\Web;
 
 use Eccube\Common\Constant;
 use Eccube\Tests\Web\AbstractWebTestCase;
-use Symfony\Component\DomCrawler\Crawler;
 
 /**
- * Class RecommendControllerTest
- * @package Plugin\Recommend\Tests\Web
+ * Class RecommendControllerTest.
  */
 class RecommendControllerTest extends AbstractWebTestCase
 {
     /**
-     * setUp
+     * setUp.
      */
     public function setUp()
     {
@@ -34,7 +32,7 @@ class RecommendControllerTest extends AbstractWebTestCase
     }
 
     /**
-     * Block.RecommendController
+     * Block.RecommendController.
      */
     public function testRecommendBlock()
     {
@@ -48,6 +46,7 @@ class RecommendControllerTest extends AbstractWebTestCase
     /**
      * @param $productId
      * @param $rank
+     *
      * @return \Plugin\Recommend\Entity\RecommendProduct
      */
     private function initRecommendData($productId, $rank)
@@ -67,5 +66,4 @@ class RecommendControllerTest extends AbstractWebTestCase
 
         return $Recommend;
     }
-
 }
