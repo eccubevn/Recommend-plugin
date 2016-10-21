@@ -22,12 +22,7 @@ build_failure_conditions:
 
 filter:
     excluded_paths:
-        - vendor/*
-        - tests/*
-        - docs/*
-        - html/template/**/js/vendor/*
-        - html/template/**/**/js/vendor/*
-        - src/Eccube/Entity/*
+        - Tests/*
 
 tools:
     # Runs the JSHint static analysis tool (https://scrutinizer-ci.com/docs/tools/javascript/jshint/)
