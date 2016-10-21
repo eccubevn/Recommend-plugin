@@ -11,6 +11,7 @@
 namespace Plugin\Recommend\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Eccube\Entity\Master\Disp;
 use Plugin\Recommend\Entity\RecommendProduct;
 
@@ -22,6 +23,20 @@ use Plugin\Recommend\Entity\RecommendProduct;
  */
 class RecommendProductRepository extends EntityRepository
 {
+    /**
+     * Find list
+     *
+     * @return mixed
+     */
+    public function getRecommendList()
+    {
+        $qb = $this->createQueryBuilder('rp')
+            ->innerJoin('rp.Product', 'p');
+        $qb->addOrderBy('rp.rank', 'DESC');
+
+        return $qb->getQuery()->getResult();
+    }
+
     /**
      * Get max rank
      *
