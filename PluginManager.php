@@ -19,12 +19,10 @@ use Eccube\Util\Cache;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Class PluginManager
- * @package Plugin\Recommend
+ * Class PluginManager.
  */
 class PluginManager extends AbstractPluginManager
 {
-
     /**
      * @var string コピー元ブロックファイル
      */
@@ -109,9 +107,10 @@ class PluginManager extends AbstractPluginManager
     }
 
     /**
-     * ブロックを登録
+     * ブロックを登録.
      *
      * @param \Eccube\Application $app
+     *
      * @throws \Exception
      */
     private function createDataBlock($app)
@@ -163,9 +162,10 @@ class PluginManager extends AbstractPluginManager
     }
 
     /**
-     * ブロックを削除
+     * ブロックを削除.
      *
      * @param \Eccube\Application $app
+     *
      * @throws \Exception
      */
     private function removeDataBlock($app)
@@ -201,7 +201,7 @@ class PluginManager extends AbstractPluginManager
     }
 
     /**
-     * Copy block template
+     * Copy block template.
      *
      * @param $app
      */
@@ -214,7 +214,7 @@ class PluginManager extends AbstractPluginManager
     }
 
     /**
-     * Remove block template
+     * Remove block template.
      *
      * @param $app
      */

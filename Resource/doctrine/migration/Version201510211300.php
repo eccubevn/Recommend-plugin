@@ -18,8 +18,7 @@ use Eccube\Common\Constant;
 use Doctrine\ORM\EntityManager;
 
 /**
- * Class Version201510211300
- * @package DoctrineMigrations
+ * Class Version201510211300.
  */
 class Version201510211300 extends AbstractMigration
 {
@@ -33,7 +32,7 @@ class Version201510211300 extends AbstractMigration
     );
 
     /**
-     * Setup data
+     * Setup data.
      *
      * @param Schema $schema
      */
@@ -47,7 +46,7 @@ class Version201510211300 extends AbstractMigration
     }
 
     /**
-     * Remove data
+     * Remove data.
      *
      * @param Schema $schema
      */
@@ -78,9 +77,10 @@ class Version201510211300 extends AbstractMigration
     }
 
     /**
-     * Create recommend table
+     * Create recommend table.
      *
      * @param Schema $schema
+     *
      * @return bool
      */
     protected function createRecommendProduct(Schema $schema)
@@ -100,9 +100,8 @@ class Version201510211300 extends AbstractMigration
         return true;
     }
 
-
     /**
-     * おすすめ商品テーブル作成
+     * おすすめ商品テーブル作成.
      *
      * @param Schema $schema
      */
@@ -149,9 +148,10 @@ class Version201510211300 extends AbstractMigration
     }
 
     /**
-     * Get metadata
+     * Get metadata.
      *
      * @param EntityManager $em
+     *
      * @return array
      */
     protected function getMetadata(EntityManager $em)

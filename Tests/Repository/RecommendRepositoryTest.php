@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Plugin\Recommend\Tests\Repository;
 
 use Eccube\Common\Constant;
@@ -15,13 +16,12 @@ use Plugin\Recommend\Entity\RecommendProduct;
 use Eccube\Entity\Master\Disp;
 
 /**
- * Class RecommendRepositoryTest
- * @package Plugin\Recommend\Tests\Repository
+ * Class RecommendRepositoryTest.
  */
 class RecommendRepositoryTest extends AbstractAdminWebTestCase
 {
     /**
-     * Delete all Recommend for testing
+     * Delete all Recommend for testing.
      */
     public function setUp()
     {
@@ -34,10 +34,8 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
         $this->initRecommendData(2, 2);
     }
 
-
-
     /**
-     * function : getMaxRank
+     * function : getMaxRank.
      */
     public function testGetMaxRank()
     {
@@ -49,7 +47,7 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
     }
 
     /**
-     * function : getRecommendProduct
+     * function : getRecommendProduct.
      */
     public function testGetRecommendProduct()
     {
@@ -64,6 +62,7 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
     /**
      * @param $productId
      * @param $rank
+     *
      * @return RecommendProduct
      */
     private function initRecommendData($productId, $rank)

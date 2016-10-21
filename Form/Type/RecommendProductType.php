@@ -20,12 +20,10 @@ use Symfony\Component\Form\FormEvents;
 use Eccube\Form\DataTransformer;
 
 /**
- * Class RecommendProductType
- * @package Plugin\Recommend\Form\Type
+ * Class RecommendProductType.
  */
 class RecommendProductType extends AbstractType
 {
-
     /**
      * @var \Eccube\Application
      */
@@ -42,7 +40,7 @@ class RecommendProductType extends AbstractType
     }
 
     /**
-     * Build config type form
+     * Build config type form.
      *
      * @param FormBuilderInterface $builder
      * @param array                $options
