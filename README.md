@@ -1,5 +1,8 @@
 # おすすめ商品管理プラグイン
 
+[![Build Status](https://travis-ci.org/EC-CUBE/Recommend-plugin.svg?branch=master)](https://travis-ci.org/EC-CUBE/Recommend-plugin)
+[![Build status](https://ci.appveyor.com/api/projects/status/pql8xjdrsmp24teg?svg=true)](https://ci.appveyor.com/project/ECCUBE/recommend-plugin)
+
 ## 概要
 サイトにおすすめ商品の一覧を追加することのできるプラグイン。  
 [http://www.ec-cube.net/products/detail.php?product_id=1067](http://www.ec-cube.net/products/detail.php?product_id=1067)  
