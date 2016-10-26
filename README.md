@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/EC-CUBE/Recommend-plugin.svg?branch=master)](https://travis-ci.org/EC-CUBE/Recommend-plugin)
 [![Build status](https://ci.appveyor.com/api/projects/status/pql8xjdrsmp24teg?svg=true)](https://ci.appveyor.com/project/ECCUBE/recommend-plugin)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/10c271df-67d7-415d-9dad-6ef44e09741c/mini.png)](https://insight.sensiolabs.com/projects/10c271df-67d7-415d-9dad-6ef44e09741c)
 
 ## 概要
 サイトにおすすめ商品の一覧を追加することのできるプラグイン。  
