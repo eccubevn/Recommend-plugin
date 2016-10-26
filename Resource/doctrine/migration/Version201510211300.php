@@ -1,63 +1,113 @@
 <?php
 /*
- * This file is part of EC-CUBE
+ * This file is part of the Recommend Product plugin
  *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
+ * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
  *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace DoctrineMigrations;
 
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\Tools\SchemaTool;
+use Eccube\Application;
+use Eccube\Common\Constant;
+use Doctrine\ORM\EntityManager;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Class Version201510211300.
  */
 class Version201510211300 extends AbstractMigration
 {
+    /**
+     * @var string table name
+     */
+    const NAME = 'plg_recommend_product';
+
+    protected $entities = array(
+        'Plugin\Recommend\Entity\RecommendProduct',
+    );
 
     /**
+     * Setup data.
+     *
      * @param Schema $schema
      */
     public function up(Schema $schema)
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        $this->createRecommendProduct($schema);
+        if (version_compare(Constant::VERSION, '3.0.9', '>=')) {
+            $this->createRecommendProduct($schema);
+        } else {
+            $this->createRecommendProductForOldVersion($schema);
+        }
     }
 
     /**
+     * Remove data.
+     *
      * @param Schema $schema
      */
     public function down(Schema $schema)
     {
-        // this down() migration is auto-generated, please modify it to your needs
-        $schema->dropTable('plg_recommend_product');
-        $schema->dropSequence('plg_recommend_product_recommend_product_id_seq');
+        if (version_compare(Constant::VERSION, '3.0.9', '>=')) {
+            $app = Application::getInstance();
+            $meta = $this->getMetadata($app['orm.em']);
+            $tool = new SchemaTool($app['orm.em']);
+            $schemaFromMetadata = $tool->getSchemaFromMetadata($meta);
+            // テーブル削除
+            foreach ($schemaFromMetadata->getTables() as $table) {
+                if ($schema->hasTable($table->getName())) {
+                    $schema->dropTable($table->getName());
+                }
+            }
+            // シーケンス削除
+            foreach ($schemaFromMetadata->getSequences() as $sequence) {
+                if ($schema->hasSequence($sequence->getName())) {
+                    $schema->dropSequence($sequence->getName());
+                }
+            }
+        } else {
+            // this down() migration is auto-generated, please modify it to your needs
+            $schema->dropTable(self::NAME);
+            $schema->dropSequence('plg_recommend_product_recommend_product_id_seq');
+        }
     }
 
     /**
-     * おすすめ商品テーブル作成
+     * Create recommend table.
+     *
      * @param Schema $schema
+     *
+     * @return bool
      */
     protected function createRecommendProduct(Schema $schema)
     {
-        $table = $schema->createTable("plg_recommend_product");
+        if ($schema->hasTable(self::NAME)) {
+            return true;
+        }
+
+        $app = Application::getInstance();
+        $em = $app['orm.em'];
+        $classes = array(
+            $em->getClassMetadata('Plugin\Recommend\Entity\RecommendProduct'),
+        );
+        $tool = new SchemaTool($em);
+        $tool->createSchema($classes);
+
+        return true;
+    }
+
+    /**
+     * おすすめ商品テーブル作成.
+     *
+     * @param Schema $schema
+     */
+    protected function createRecommendProductForOldVersion(Schema $schema)
+    {
+        $table = $schema->createTable(self::NAME);
         $table->addColumn('recommend_product_id', 'integer', array(
             'autoincrement' => true,
             'notnull' => true,
@@ -97,4 +147,20 @@ class Version201510211300 extends AbstractMigration
         $table->setPrimaryKey(array('recommend_product_id'));
     }
 
+    /**
+     * Get metadata.
+     *
+     * @param EntityManager $em
+     *
+     * @return array
+     */
+    protected function getMetadata(EntityManager $em)
+    {
+        $meta = array();
+        foreach ($this->entities as $entity) {
+            $meta[] = $em->getMetadataFactory()->getMetadataFor($entity);
+        }
+
+        return $meta;
+    }
 }
