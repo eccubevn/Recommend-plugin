@@ -1,6 +1,6 @@
 name: おすすめ商品管理プラグイン
 code: Recommend
-version: 1.0.4
+version: 2.0.0
 service:
     - RecommendServiceProvider
 orm.path:
