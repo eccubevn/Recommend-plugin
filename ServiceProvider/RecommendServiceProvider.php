@@ -10,12 +10,16 @@
 
 namespace Plugin\Recommend\ServiceProvider;
 
+use Eccube\Common\Constant;
 use Plugin\Recommend\Form\Type\RecommendProductType;
 use Plugin\Recommend\Service\RecommendService;
 use Silex\Application as BaseApplication;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Symfony\Component\Yaml\Yaml;
+
+// include log functions (for 3.0.0 - 3.0.11)
+require_once(__DIR__.'/../log.php');
 
 /**
  * Class RecommendServiceProvider.
@@ -125,6 +129,11 @@ class RecommendServiceProvider implements ServiceProviderInterface
 
             return $config;
         }));
+
+        // initialize logger (for 3.0.0 - 3.0.8)
+        if (version_compare(Constant::VERSION, '3.0.8', '<=')) {
+            eccube_log_init($app);
+        }
     }
 
     /**

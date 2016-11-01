@@ -16,6 +16,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
+// include log functions (for 3.0.0 - 3.0.11)
+require_once(__DIR__.'/../log.php');
+
 /**
  * Class RecommendController.
  */
@@ -58,6 +61,7 @@ class RecommendController extends AbstractController
 
             if (!$Recommend) {
                 $app->addError('admin.recommend.not_found', 'admin');
+                log_error('the recommend product is not found.', array('Recommend id' => $id));
 
                 return $app->redirect($app->url('admin_recommend_list'));
             }
@@ -77,15 +81,18 @@ class RecommendController extends AbstractController
             if (is_null($data['id'])) {
                 if ($status = $service->createRecommend($data)) {
                     $app->addSuccess('admin.plugin.recommend.register.success', 'admin');
+                    log_info('add the new recommend product.', array('Product id' => $data['Product']->getId()));
                 }
             } else {
                 if ($status = $service->updateRecommend($data)) {
                     $app->addSuccess('admin.plugin.recommend.update.success', 'admin');
+                    log_info('update the recommend product.', array('Product id' => $data['Product']->getId()));
                 }
             }
 
             if (!$status) {
                 $app->addError('admin.recommend.not_found', 'admin');
+                log_error('failed the recommend product updating.', array('Product id' => $data['Product']->getId()));
             }
 
             return $app->redirect($app->url('admin_recommend_list'));
@@ -142,6 +149,7 @@ class RecommendController extends AbstractController
             $app->addSuccess('admin.plugin.recommend.delete.success', 'admin');
         } else {
             $app->addError('admin.recommend.not_found', 'admin');
+            log_error('the recommend product is not found.', array('Recommend id' => $id));
         }
 
         return $app->redirect($app->url('admin_recommend_list'));
