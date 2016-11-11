@@ -10,9 +10,9 @@
 
 namespace Plugin\Recommend\ServiceProvider;
 
-use Eccube\Common\Constant;
 use Plugin\Recommend\Form\Type\RecommendProductType;
 use Plugin\Recommend\Service\RecommendService;
+use Plugin\Recommend\Utils\Version;
 use Silex\Application as BaseApplication;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
@@ -131,7 +131,7 @@ class RecommendServiceProvider implements ServiceProviderInterface
         }));
 
         // initialize logger (for 3.0.0 - 3.0.8)
-        if (version_compare(Constant::VERSION, '3.0.8', '<=')) {
+        if (Version::isSupport('3.0.8', '<=')) {
             eccube_log_init($app);
         }
     }

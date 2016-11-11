@@ -14,9 +14,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Eccube\Application;
 use Symfony\Component\HttpFoundation\Request;
 
-// include log functions (for 3.0.0 - 3.0.11)
-require_once(__DIR__.'/../log.php');
-
 /**
  * Class RecommendSearchModelController.
  */
@@ -37,7 +34,7 @@ class RecommendSearchModelController
             return null;
         }
 
-        log_debug('search product start.');
+        log_debug('Search product start.');
 
         $pageCount = $app['config']['default_page_count'];
         $session = $app['session'];
@@ -76,9 +73,9 @@ class RecommendSearchModelController
         /** @var ArrayCollection */
         $arrProduct = $pagination->getItems();
 
-        log_debug('search product finish.');
+        log_debug('Search product finish.');
         if (count($arrProduct) == 0) {
-            log_debug('search product not found.');
+            log_debug('Search product not found.');
         }
 
         return $app->render('Recommend/Resource/template/admin/search_product.twig', array(

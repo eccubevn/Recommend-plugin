@@ -14,8 +14,8 @@ use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
 use Eccube\Application;
-use Eccube\Common\Constant;
 use Doctrine\ORM\EntityManager;
+use Plugin\Recommend\Utils\Version;
 
 /**
  * Class Version201510211300.
@@ -38,7 +38,7 @@ class Version201510211300 extends AbstractMigration
      */
     public function up(Schema $schema)
     {
-        if (version_compare(Constant::VERSION, '3.0.9', '>=')) {
+        if (Version::isSupport()) {
             $this->createRecommendProduct($schema);
         } else {
             $this->createRecommendProductForOldVersion($schema);
@@ -52,7 +52,7 @@ class Version201510211300 extends AbstractMigration
      */
     public function down(Schema $schema)
     {
-        if (version_compare(Constant::VERSION, '3.0.9', '>=')) {
+        if (Version::isSupport()) {
             $app = Application::getInstance();
             $meta = $this->getMetadata($app['orm.em']);
             $tool = new SchemaTool($app['orm.em']);
