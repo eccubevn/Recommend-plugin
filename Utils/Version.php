@@ -19,14 +19,22 @@ use Eccube\Common\Constant;
 class Version
 {
     /**
-     * Check support in version Ec cube
+     * Check version to support get instance function. (monolog, new style, ...)
      *
-     * @param string $version
-     * @param string $operation
      * @return bool|int|mixed|void
      */
-    public static function isSupport($version = '3.0.9', $operation = '>=')
+    public static function isSupportGetInstanceFunction()
     {
-        return version_compare(Constant::VERSION, $version, $operation);
+        return version_compare(Constant::VERSION, '3.0.9', '>=');
+    }
+
+    /**
+     * Check version to support new log function.
+     *
+     * @return bool|int|mixed|void
+     */
+    public static function isSupportLogFunction()
+    {
+        return version_compare(Constant::VERSION, '3.0.12', '>=');
     }
 }

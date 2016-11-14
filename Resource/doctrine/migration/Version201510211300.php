@@ -38,7 +38,7 @@ class Version201510211300 extends AbstractMigration
      */
     public function up(Schema $schema)
     {
-        if (Version::isSupport()) {
+        if (Version::isSupportGetInstanceFunction()) {
             $this->createRecommendProduct($schema);
         } else {
             $this->createRecommendProductForOldVersion($schema);
@@ -52,7 +52,7 @@ class Version201510211300 extends AbstractMigration
      */
     public function down(Schema $schema)
     {
-        if (Version::isSupport()) {
+        if (Version::isSupportGetInstanceFunction()) {
             $app = Application::getInstance();
             $meta = $this->getMetadata($app['orm.em']);
             $tool = new SchemaTool($app['orm.em']);

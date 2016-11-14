@@ -10,7 +10,7 @@
 
 use Plugin\Recommend\Utils\Version;
 
-if (Version::isSupport('3.0.12', '>=')) {
+if (Version::isSupportLogFunction()) {
     return;
 }
 
