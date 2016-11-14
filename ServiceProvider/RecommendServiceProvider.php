@@ -10,12 +10,13 @@
 
 namespace Plugin\Recommend\ServiceProvider;
 
-use Eccube\Common\Constant;
 use Plugin\Recommend\Form\Type\RecommendProductType;
 use Plugin\Recommend\Service\RecommendService;
+use Plugin\Recommend\Utils\Version;
 use Silex\Application as BaseApplication;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Yaml\Yaml;
 
 // include log functions (for 3.0.0 - 3.0.11)
@@ -84,7 +85,7 @@ class RecommendServiceProvider implements ServiceProviderInterface
         });
 
         // メッセージ登録
-        $app['translator'] = $app->share($app->extend('translator', function ($translator, Application $app) {
+        $app['translator'] = $app->share($app->extend('translator', function (Translator $translator, Application $app) {
             $file = __DIR__.'/../Resource/locale/message.'.$app['locale'].'.yml';
             if (file_exists($file)) {
                 $translator->addResource('yaml', $file, $app['locale']);
@@ -131,7 +132,7 @@ class RecommendServiceProvider implements ServiceProviderInterface
         }));
 
         // initialize logger (for 3.0.0 - 3.0.8)
-        if (version_compare(Constant::VERSION, '3.0.8', '<=')) {
+        if (!Version::isSupportGetInstanceFunction()) {
             eccube_log_init($app);
         }
     }

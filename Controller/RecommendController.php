@@ -12,12 +12,11 @@ namespace Plugin\Recommend\Controller;
 
 use Eccube\Application;
 use Eccube\Controller\AbstractController;
+use Plugin\Recommend\Entity\RecommendProduct;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-
-// include log functions (for 3.0.0 - 3.0.11)
-require_once(__DIR__.'/../log.php');
 
 /**
  * Class RecommendController.
@@ -53,6 +52,7 @@ class RecommendController extends AbstractController
      */
     public function edit(Application $app, Request $request, $id = null)
     {
+        /* @var RecommendProduct $Recommend */
         $Recommend = null;
         $Product = null;
         if (!is_null($id)) {
@@ -61,7 +61,7 @@ class RecommendController extends AbstractController
 
             if (!$Recommend) {
                 $app->addError('admin.recommend.not_found', 'admin');
-                log_error('the recommend product is not found.', array('Recommend id' => $id));
+                log_info('The recommend product is not found.', array('Recommend id' => $id));
 
                 return $app->redirect($app->url('admin_recommend_list'));
             }
@@ -70,6 +70,7 @@ class RecommendController extends AbstractController
         }
 
         // formの作成
+        /* @var Form $form */
         $form = $app['form.factory']
             ->createBuilder('admin_recommend', $Recommend)
             ->getForm();
@@ -81,18 +82,18 @@ class RecommendController extends AbstractController
             if (is_null($data['id'])) {
                 if ($status = $service->createRecommend($data)) {
                     $app->addSuccess('admin.plugin.recommend.register.success', 'admin');
-                    log_info('add the new recommend product.', array('Product id' => $data['Product']->getId()));
+                    log_info('Add the new recommend product success.', array('Product id' => $data['Product']->getId()));
                 }
             } else {
                 if ($status = $service->updateRecommend($data)) {
                     $app->addSuccess('admin.plugin.recommend.update.success', 'admin');
-                    log_info('update the recommend product.', array('Product id' => $data['Product']->getId()));
+                    log_info('Update the recommend product success.', array('Recommend id' => $Recommend->getId(), 'Product id' => $data['Product']->getId()));
                 }
             }
 
             if (!$status) {
                 $app->addError('admin.recommend.not_found', 'admin');
-                log_error('failed the recommend product updating.', array('Product id' => $data['Product']->getId()));
+                log_info('Failed the recommend product updating.', array('Product id' => $data['Product']->getId()));
             }
 
             return $app->redirect($app->url('admin_recommend_list'));
@@ -132,6 +133,7 @@ class RecommendController extends AbstractController
 
         // Check request
         if (!'POST' === $request->getMethod()) {
+            log_error('Delete with bad method!');
             throw new BadRequestHttpException();
         }
 
@@ -146,10 +148,11 @@ class RecommendController extends AbstractController
 
         // おすすめ商品情報を削除する
         if ($service->deleteRecommend($id)) {
+            log_info('The recommend product delete success!', array('Recommend id' => $id));
             $app->addSuccess('admin.plugin.recommend.delete.success', 'admin');
         } else {
             $app->addError('admin.recommend.not_found', 'admin');
-            log_error('the recommend product is not found.', array('Recommend id' => $id));
+            log_info('The recommend product is not found.', array('Recommend id' => $id));
         }
 
         return $app->redirect($app->url('admin_recommend_list'));
@@ -167,7 +170,8 @@ class RecommendController extends AbstractController
     {
         if ($request->isXmlHttpRequest()) {
             $arrRank = $request->request->all();
-            $app['eccube.plugin.recommend.repository.recommend_product']->moveRecommendRank($arrRank);
+            $arrRankMoved = $app['eccube.plugin.recommend.repository.recommend_product']->moveRecommendRank($arrRank);
+            log_info('Recommend move rank', $arrRankMoved);
         }
 
         return true;

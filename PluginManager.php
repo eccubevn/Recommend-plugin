@@ -11,6 +11,7 @@
 namespace Plugin\Recommend;
 
 use Eccube\Common\Constant;
+use Eccube\Entity\Block;
 use Eccube\Entity\BlockPosition;
 use Eccube\Entity\Master\DeviceType;
 use Eccube\Entity\PageLayout;
@@ -116,19 +117,31 @@ class PluginManager extends AbstractPluginManager
     private function createDataBlock($app)
     {
         $em = $app['orm.em'];
+
         try {
             $DeviceType = $app['eccube.repository.master.device_type']->find(DeviceType::DEVICE_TYPE_PC);
 
-            /** @var \Eccube\Entity\Block $Block */
-            $Block = $app['eccube.repository.block']->findOrCreate(null, $DeviceType);
+            // check exists block
+            /** @var Block $Block */
+            $Block = $app['eccube.repository.block']->findOneBy(array('DeviceType' => $DeviceType, 'file_name' => $this->blockFileName));
+            if (!$Block) {
+                /** @var Block $Block */
+                $Block = $app['eccube.repository.block']->findOrCreate(null, $DeviceType);
 
-            // Blockの登録
-            $Block->setName($this->blockName)
-                ->setFileName($this->blockFileName)
-                ->setDeletableFlg(Constant::DISABLED)
-                ->setLogicFlg(1);
-            $em->persist($Block);
-            $em->flush($Block);
+                // Blockの登録
+                $Block->setName($this->blockName)
+                    ->setFileName($this->blockFileName)
+                    ->setDeletableFlg(Constant::DISABLED)
+                    ->setLogicFlg(1);
+                $em->persist($Block);
+                $em->flush($Block);
+            }
+
+            // check exists block position
+            $blockPos = $em->getRepository('Eccube\Entity\BlockPosition')->findOneBy(array('block_id' => $Block->getId()));
+            if ($blockPos) {
+                return;
+            }
 
             // BlockPositionの登録
             $blockPos = $em->getRepository('Eccube\Entity\BlockPosition')->findOneBy(

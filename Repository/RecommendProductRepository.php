@@ -94,6 +94,7 @@ class RecommendProductRepository extends EntityRepository
     public function moveRecommendRank(array $arrRank)
     {
         $this->getEntityManager()->beginTransaction();
+        $arrRankMoved = array();
         try {
             foreach ($arrRank as $recommendId => $rank) {
                 /* @var $Recommend RecommendProduct */
@@ -101,6 +102,7 @@ class RecommendProductRepository extends EntityRepository
                 if ($Recommend->getRank() == $rank) {
                     continue;
                 }
+                $arrRankMoved[$recommendId] = $rank;
                 $Recommend->setRank($rank);
                 $this->getEntityManager()->persist($Recommend);
             }
@@ -111,7 +113,7 @@ class RecommendProductRepository extends EntityRepository
             throw $e;
         }
 
-        return true;
+        return $arrRankMoved;
     }
 
     /**

@@ -33,9 +33,7 @@ Plugin\Recommend\Entity\RecommendProduct:
     manyToOne:
         Product:
             targetEntity: Eccube\Entity\Product
-            inversedBy: RecommendProduct
             joinColumn:
                 name: product_id
                 referencedColumnName: product_id
     lifecycleCallbacks: {  }
-    

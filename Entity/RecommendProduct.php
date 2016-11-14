@@ -37,11 +37,6 @@ class RecommendProduct extends AbstractEntity
     /**
      * @var int
      */
-    private $status;
-
-    /**
-     * @var int
-     */
     private $del_flg;
 
     /**
