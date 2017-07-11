@@ -12,6 +12,7 @@ namespace Plugin\Recommend\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Eccube\Application;
+use Plugin\Recommend\Utils\Version;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -43,10 +44,16 @@ class RecommendSearchModelController
             $searchData = array(
                 'name' => trim($request->get('id')),
             );
+
             if ($categoryId = $request->get('category_id')) {
-                $Category = $app['eccube.repository.category']->find($categoryId);
-                $searchData['category_id'] = $Category;
+                $searchData['category_id'] = $app['eccube.repository.category']->find($categoryId);
+
+                // New rule for session
+                if (Version::isSupportNewSession()) {
+                    $searchData['category_id'] = $categoryId;
+                }
             }
+
             $session->set('eccube.plugin.recommend.product.search', $searchData);
             $session->set('eccube.plugin.recommend.product.search.page_no', $page_no);
         } else {
@@ -60,6 +67,10 @@ class RecommendSearchModelController
 
         //set parameter
         $searchData['id'] = $searchData['name'];
+
+        if (!empty($searchData['category_id']) && Version::isSupportNewSession()) {
+            $searchData['category_id'] = $app['eccube.repository.category']->find($searchData['category_id']);
+        }
 
         $qb = $app['eccube.repository.product']->getQueryBuilderBySearchDataForAdmin($searchData);
 
