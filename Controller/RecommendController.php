@@ -10,7 +10,6 @@
 
 namespace Plugin\Recommend\Controller;
 
-use Eccube\Application;
 use Eccube\Controller\AbstractController;
 use Eccube\Form\Type\Admin\SearchProductType;
 use Plugin\Recommend\Entity\RecommendProduct;
@@ -23,7 +22,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class RecommendController.
@@ -90,7 +88,7 @@ class RecommendController extends AbstractController
             $Recommend = $this->recommendProductRepository->find($id);
 
             if (!$Recommend) {
-                $this->addError('admin.recommend.not_found', 'admin');
+                $this->addError('admin.plugin.recommend.not_found', 'admin');
                 log_info('The recommend product is not found.', array('Recommend id' => $id));
 
                 return $this->redirectToRoute('plugin_recommend_list');
@@ -122,7 +120,7 @@ class RecommendController extends AbstractController
             }
 
             if (!$status) {
-                $this->addError('admin.recommend.not_found', 'admin');
+                $this->addError('admin.plugin.recommend.not_found', 'admin');
                 log_info('Failed the recommend product updating.', array('Product id' => $data['Product']->getId()));
             }
 
@@ -166,7 +164,7 @@ class RecommendController extends AbstractController
             log_info('The recommend product delete success!', array('Recommend id' => $RecommendProduct->getId()));
             $this->addSuccess('admin.plugin.recommend.delete.success', 'admin');
         } else {
-            $this->addError('admin.recommend.not_found', 'admin');
+            $this->addError('admin.plugin.recommend.not_found', 'admin');
             log_info('The recommend product is not found.', array('Recommend id' => $RecommendProduct->getId()));
         }
 

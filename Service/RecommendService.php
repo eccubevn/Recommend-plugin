@@ -73,11 +73,12 @@ class RecommendService
     }
 
     /**
-     * おすすめ商品情報を生成する.
+     * おすすめ商品情報を生成する
      *
-     * @param array $data
-     *
+     * @param $data
      * @return RecommendProduct
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     protected function newRecommend($data)
     {

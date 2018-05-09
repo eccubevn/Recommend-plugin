@@ -14,8 +14,8 @@
 
 {% set menus = ['content', 'plugin_recommend'] %}
 
-{% block title %}おすすめ商品管理{% endblock %}
-{% block sub_title %}おすすめ商品内容設定{% endblock %}
+{% block title %}{{ 'admin.plugin.recommend.index.title'|trans }}{% endblock %}
+{% block sub_title %}{{ 'admin.plugin.recommend.index.subtitle'|trans }}{% endblock %}
 
 {% block stylesheet %}
     <style type="text/css">
@@ -80,7 +80,7 @@
         <div class="c-contentsArea__primaryCol">
             <div class="c-primaryCol">
                 <div class="card rounded border-0 mb-4">
-                    <div class="card-header"><span class="normal"><strong>{{ total_item_count }} 件</strong> が該当しました</span></div>
+                    <div class="card-header"><span class="normal">{{ 'admin.plugin.recommend.index.total_num'|trans({'%number%' : total_item_count})|raw }}</span></div>
                     <div class="card-body p-0">
 
                         {% if pagination %}
@@ -88,17 +88,17 @@
                                 <li class="list-group-item">
                                     <div class="row justify-content-around">
                                         <div class="col-auto"><strong>&nbsp;&nbsp;</strong></div>
-                                        <div class="col-2"><strong>商品画像</strong></div>
-                                        <div class="col-2"><strong>商品名</strong></div>
-                                        <div class="col-auto"><strong>説明文</strong></div>
+                                        <div class="col-2"><strong>{{ 'admin.plugin.recommend.index.col2'|trans }}</strong></div>
+                                        <div class="col-2"><strong>{{ 'admin.plugin.recommend.index.col3'|trans }}</strong></div>
+                                        <div class="col-auto"><strong>{{ 'admin.plugin.recommend.index.col4'|trans }}</strong></div>
                                         <div class="col"><strong></strong></div>
                                     </div>
                                 </li>
                                 {% for RecommendProduct in pagination %}
                                     <li class="list-group-item sortable-item" data-sort-no="{{ RecommendProduct.sort_no }}" data-id="{{ RecommendProduct.id }}">
                                         <div class="row justify-content-around">
-                                            <div class="col-auto d-flex align-items-center"><i class="fa fa-bars text-ec-gray"></i></div>
 
+                                            <div class="col-auto d-flex align-items-center"><i class="fa fa-bars text-ec-gray"></i></div>
                                             <div class="col-2">
                                                 <a href="{{ url('plugin_recommend_edit', { id : RecommendProduct.id }) }}" >
                                                     <img src="{{ asset(RecommendProduct.Product.mainFileName|no_image_product, 'save_image') }}" style="max-width: 100px;"/>
@@ -113,7 +113,7 @@
                                                     {% endif %}
                                                 </a>
                                             </div>
-                                            <div class="col-3 d-flex">{{ RecommendProduct.comment|raw|nl2br }}</div>
+                                            <div class="col-6 d-flex">{{ RecommendProduct.comment|raw|nl2br }}</div>
 
                                             <div class="col text-right">
                                                 <a href="{{ url('plugin_recommend_edit', { id : RecommendProduct.id }) }}"
@@ -139,13 +139,13 @@
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title font-weight-bold">
-                                                                {{ 'admin.plugin.coupon.index.delete.confirm'|trans }}</h5>
+                                                                {{ 'admin.plugin.recommend.index.delete.confirm'|trans }}</h5>
                                                             <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
                                                             </button>
                                                         </div>
                                                         <div class="modal-body text-left">
                                                             <p class="text-left">
-                                                                {{ 'admin.plugin.coupon.index.delete.confirm'|trans }}</p>
+                                                                {{ 'admin.plugin.recommend.index.delete.confirm'|trans }}</p>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button class="btn btn-ec-sub" type="button"
@@ -167,14 +167,13 @@
                     </div><!-- /.box -->
                 </div><!-- /.col -->
 
-                <p>{{'admin.setting.shop.payment.notice'|trans}}</p>
-
+                <p>{{'admin.plugin.recommend.notice'|trans}}</p>
             </div>
 
             <div class="card rounded border-0">
                 <div class="card-body p-4">
                     <div class="text-center">
-                        <a href="{{ url('plugin_recommend_new') }}" class="btn btn-ec-regular pl-4 pr-4">{{ 'おすすめ商品を新規登録'|trans }}</a>
+                        <a href="{{ url('plugin_recommend_new') }}" class="btn btn-ec-regular pl-4 pr-4">{{ 'admin.plugin.recommend.new'|trans }}</a>
                     </div>
                 </div>
             </div>

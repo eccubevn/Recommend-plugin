@@ -14,7 +14,7 @@
             <li class="ec-shelfGrid__item">
                 <a href="{{ url('product_detail', {'id': RecommendProduct.Product.id}) }}">
                     <img src="{{ asset(RecommendProduct.Product.mainFileName|no_image_product, "save_image") }}">
-                    <p>{{ RecommendProduct.comment|raw|nl2br|ellipsis }}</p>
+                    <p>{{ RecommendProduct.comment|raw|nl2br }}</p>
                     <dl>
                         <dt class="item_name">{{ RecommendProduct.Product.name }}</dt>
                         <dd class="item_price">

@@ -10,11 +10,12 @@
 
 {% set menus = ['content', 'plugin_recommend'] %}
 
-{% block title %}おすすめ商品管理{% endblock %}
-{% block sub_title %}おすすめ商品内容設定{% endblock %}
+{% block title %}{{ 'admin.plugin.recommend.edit.title'|trans }}{% endblock %}
+{% block sub_title %}{{ 'admin.plugin.recommend.edit.subtitle'|trans }}{% endblock %}
 
 {% form_theme form '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
 {% form_theme searchProductModalForm '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
+
 {% block stylesheet %}
     <style type="text/css">
         .col-sm-2 {
@@ -68,7 +69,7 @@
                 <div class="c-primaryCol">
                     <div class="card rounded border-0 mb-4">
                         <div class="card-header">
-                            <span>おすすめ商品情報</span>
+                            <span>{{ 'admin.plugin.recommend.edit.header'|trans }}</span>
                         </div><!-- /.box-header -->
 
                         <div class="card-body">
@@ -110,7 +111,7 @@
                                         <p id="product_code" class="d-none"></p>
                                     {% endif %}
 
-                                    <a id="showSearchProductModal" class="btn btn-ec-regular mr-2" data-toggle="modal" data-target="#searchProductModal">商品の追加</a>
+                                    <a id="showSearchProductModal" class="btn btn-ec-regular mr-2" data-toggle="modal" data-target="#searchProductModal">{{ 'admin.plugin.recommend.edit.search'|trans }}</a>
                                     <div class="clearfix"></div>
                                     {{ form_widget(form.Product) }}
                                     {{ form_errors(form.Product) }}
@@ -123,7 +124,7 @@
                                 <div class="col mb-2">
                                     {{ form_widget(form.comment, { attr : { rows : "8"} }) }}
                                     {{ form_errors(form.comment) }}
-                                    <p class="text-muted" style="text-align: right">（最大4000文字）</p>
+                                    <p class="text-muted" style="text-align: right">{{ 'admin.plugin.recommend.edit.comment.help'|trans({'%number%' : eccube_config.text_area_len}) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -164,7 +165,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="searchProductModalLabel">商品検索</h4>
+                    <h4 class="modal-title" id="searchProductModalLabel">{{ 'admin.plugin.recommend.edit.product_search.header'|trans }}</h4>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -178,7 +179,7 @@
                         {{ form_widget(searchProductModalForm.category_id) }}
                     </div>
                     <div class="form-group text-center">
-                        <button type="button" id="searchProductModalButton" class="btn btn-primary" >検索</button>
+                        <button type="button" id="searchProductModalButton" class="btn btn-primary" >{{ 'admin.plugin.recommend.edit.product_search.button'|trans }}</button>
                     </div>
                     <div class="form-group" id="searchProductModalList">
                     </div>

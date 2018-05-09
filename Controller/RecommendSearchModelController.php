@@ -11,8 +11,6 @@
 namespace Plugin\Recommend\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Eccube\Application;
-use Eccube\Common\EccubeConfig;
 use Eccube\Controller\AbstractController;
 use Eccube\Repository\CategoryRepository;
 use Eccube\Repository\ProductRepository;

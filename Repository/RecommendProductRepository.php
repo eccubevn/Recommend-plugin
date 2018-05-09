@@ -52,6 +52,8 @@ class RecommendProductRepository extends AbstractRepository
      * Get max rank.
      *
      * @return mixed
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getMaxRank()
     {
@@ -81,7 +83,9 @@ class RecommendProductRepository extends AbstractRepository
     /**
      * Number of recommend.
      *
-     * @return int
+     * @return mixed
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function countRecommend()
     {
@@ -95,9 +99,7 @@ class RecommendProductRepository extends AbstractRepository
      * Move rank.
      *
      * @param array $arrRank
-     *
-     * @return bool
-     *
+     * @return array
      * @throws \Exception
      */
     public function moveRecommendRank(array $arrRank)

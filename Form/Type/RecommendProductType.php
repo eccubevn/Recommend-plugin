@@ -50,7 +50,6 @@ class RecommendProductType extends AbstractType
         $this->entityManager = $entityManager;
     }
 
-
     /**
      * Build config type form.
      *
@@ -61,12 +60,12 @@ class RecommendProductType extends AbstractType
     {
         $builder
             ->add('id', TextType::class, array(
-                'label' => '商品',
+                'label' => 'admin.plugin.recommend.edit.product',
                 'required' => false,
                 'attr' => array('readonly' => 'readonly'),
             ))
             ->add('comment', TextareaType::class, array(
-                'label' => '説明文',
+                'label' => 'admin.plugin.recommend.edit.comment',
                 'required' => true,
                 'trim' => true,
                 'constraints' => array(
@@ -77,7 +76,7 @@ class RecommendProductType extends AbstractType
                 ),
                 'attr' => array(
                     'maxlength' => $this->eccubeConfig['text_area_len'],
-                    'placeholder' => 'plugin.recommend.type.comment.placeholder',
+                    'placeholder' => 'admin.plugin.recommend.type.comment.placeholder',
                 ),
             ));
 
@@ -93,7 +92,7 @@ class RecommendProductType extends AbstractType
             // Check product
             $Product = $data['Product'];
             if (empty($Product)) {
-                $form['comment']->addError(new FormError('plugin.recommend.type.product.not_found'));
+                $form['comment']->addError(new FormError('admin.plugin.recommend.type.product.not_found'));
 
                 return;
             }
