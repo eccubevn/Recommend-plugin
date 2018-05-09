@@ -12,51 +12,54 @@ namespace Plugin\Recommend\Service;
 
 use Eccube\Common\Constant;
 use Plugin\Recommend\Entity\RecommendProduct;
+use Plugin\Recommend\Repository\RecommendProductRepository;
 
 /**
  * Class RecommendService.
  */
 class RecommendService
 {
-    /** @var \Eccube\Application */
-    public $app;
+    /**
+     * @var RecommendProductRepository
+     */
+    private $recommendProductRepository;
 
     /**
-     * コンストラクタ
-     *
-     * @param \Eccube\Application $app
+     * RecommendService constructor.
+     * @param RecommendProductRepository $recommendProductRepository
      */
-    public function __construct($app)
+    public function __construct(RecommendProductRepository $recommendProductRepository)
     {
-        $this->app = $app;
+        $this->recommendProductRepository = $recommendProductRepository;
     }
 
+
     /**
-     * おすすめ商品情報を新規登録する.
+     * おすすめ商品情報を新規登録する
      *
-     * @param array $data
-     *
+     * @param $data
      * @return bool
+     * @throws \Exception
      */
     public function createRecommend($data)
     {
         // おすすめ商品詳細情報を生成する
         $Recommend = $this->newRecommend($data);
 
-        return $this->app['eccube.plugin.recommend.repository.recommend_product']->saveRecommend($Recommend);
+        return $this->recommendProductRepository->saveRecommend($Recommend);
     }
 
     /**
-     * おすすめ商品情報を更新する.
+     * おすすめ商品情報を更新する
      *
-     * @param array $data
-     *
+     * @param $data
      * @return bool
+     * @throws \Exception
      */
     public function updateRecommend($data)
     {
         // おすすめ商品情報を取得する
-        $Recommend = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($data['id']);
+        $Recommend = $this->recommendProductRepository->find($data['id']);
         if (!$Recommend) {
             return false;
         }
@@ -66,28 +69,7 @@ class RecommendService
         $Recommend->setProduct($data['Product']);
 
         // おすすめ商品情報を更新する
-        return $this->app['eccube.plugin.recommend.repository.recommend_product']->saveRecommend($Recommend);
-    }
-
-    /**
-     * おすすめ商品情報を削除する.
-     *
-     * @param int $recommendId
-     *
-     * @return bool
-     */
-    public function deleteRecommend($recommendId)
-    {
-        // おすすめ商品情報を取得する
-        $Recommend = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($recommendId);
-        if (!$Recommend) {
-            return false;
-        }
-        // おすすめ商品情報を書き換える
-        $Recommend->setDelFlg(Constant::ENABLED);
-
-        // おすすめ商品情報を登録する
-        return $this->app['eccube.plugin.recommend.repository.recommend_product']->saveRecommend($Recommend);
+        return $this->recommendProductRepository->saveRecommend($Recommend);
     }
 
     /**
@@ -99,13 +81,13 @@ class RecommendService
      */
     protected function newRecommend($data)
     {
-        $rank = $this->app['eccube.plugin.recommend.repository.recommend_product']->getMaxRank();
+        $rank = $this->recommendProductRepository->getMaxRank();
 
         $Recommend = new RecommendProduct();
         $Recommend->setComment($data['comment']);
         $Recommend->setProduct($data['Product']);
-        $Recommend->setRank(($rank ? $rank : 0) + 1);
-        $Recommend->setDelFlg(Constant::DISABLED);
+        $Recommend->setSortno(($rank ? $rank : 0) + 1);
+        $Recommend->setVisible(Constant::ENABLED);
 
         return $Recommend;
     }

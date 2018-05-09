@@ -10,34 +10,41 @@
 
 namespace Plugin\Recommend\Controller\Block;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Eccube\Application;
-use Eccube\Entity\Master\Disp;
-use Symfony\Component\HttpFoundation\Response;
+use Eccube\Controller\AbstractController;
+use Plugin\Recommend\Repository\RecommendProductRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class RecommendController.
  */
-class RecommendController
+class RecommendController extends AbstractController
 {
     /**
-     * Load block.
-     *
-     * @param Application $app
-     *
-     * @return Response
+     * @var RecommendProductRepository
      */
-    public function index(Application $app)
+    private $recommendProductRepository;
+
+    /**
+     * RecommendController constructor.
+     * @param RecommendProductRepository $recommendProductRepository
+     */
+    public function __construct(RecommendProductRepository $recommendProductRepository)
     {
-        $Disp = $app['eccube.repository.master.disp']->find(Disp::DISPLAY_SHOW);
+        $this->recommendProductRepository = $recommendProductRepository;
+    }
 
-        /**
-         * @var ArrayCollection
-         */
-        $arrRecommendProduct = $app['eccube.plugin.recommend.repository.recommend_product']->getRecommendProduct($Disp);
+    /**
+     * @Route("/block/recommend_product_block", name="block_recommend_product_block")
+     * @Template("Block/recommend_product_block.twig")
+     */
+    public function index(Request $request)
+    {
+        $arrRecommendProduct = $this->recommendProductRepository->getRecommendProduct();
 
-        return $app->render('Block/recommend_product_block.twig', array(
+        return array(
             'recommend_products' => $arrRecommendProduct,
-        ));
+        );
     }
 }

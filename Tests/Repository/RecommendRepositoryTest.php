@@ -73,8 +73,8 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
         $Recommend = new \Plugin\Recommend\Entity\RecommendProduct();
         $Recommend->setComment($fake->word);
         $Recommend->setProduct($this->app['eccube.repository.product']->find($productId));
-        $Recommend->setRank($rank);
-        $Recommend->setDelFlg(Constant::DISABLED);
+        $Recommend->setSortno($rank);
+        $Recommend->setVisible(Constant::DISABLED);
         $Recommend->setCreateDate($dateTime);
         $Recommend->setUpdateDate($dateTime);
         $this->app['orm.em']->persist($Recommend);

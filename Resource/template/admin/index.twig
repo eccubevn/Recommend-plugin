@@ -10,163 +10,175 @@
 [コンテンツ]-[おすすめ商品]-[一覧・検索]画面
 #}
 
-{% extends 'default_frame.twig' %}
+{% extends '@admin/styleguide_frame.twig' %}
 
-{% set menus = ['content', 'admin_recommend'] %}
+{% set menus = ['content', 'plugin_recommend'] %}
 
 {% block title %}おすすめ商品管理{% endblock %}
 {% block sub_title %}おすすめ商品内容設定{% endblock %}
 
 {% block stylesheet %}
     <style type="text/css">
-        .item_list .item_box .item_photo {
-            padding-left: 0px;
-        }
-        .sortable_list .icon_sortable {
-            top: auto;
-            position: relative;
-            margin: auto;
-            vertical-align: middle;
-        }
-        .table_list tr > th, .table_list tr > td {
-             border-left: none;
-        }
-        .ui-sortable-helper {
-            display: table;
+        .list-group-item:hover {
+            z-index: inherit;
         }
     </style>
-
 {% endblock stylesheet %}
 
 {% block javascript %}
-    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/jquery.ui/jquery.ui.core.min.js"></script>
-    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/jquery.ui/jquery.ui.widget.min.js"></script>
-    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/jquery.ui/jquery.ui.mouse.min.js"></script>
-    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/jquery.ui/jquery.ui.sortable.min.js"></script>
+    <script src="{{ asset('assets/js/vendor/jquery.ui/jquery.ui.core.min.js', 'admin') }}"></script>
+    <script src="{{ asset('assets/js/vendor/jquery.ui/jquery.ui.widget.min.js', 'admin') }}"></script>
+    <script src="{{ asset('assets/js/vendor/jquery.ui/jquery.ui.mouse.min.js', 'admin') }}"></script>
+    <script src="{{ asset('assets/js/vendor/jquery.ui/jquery.ui.sortable.min.js', 'admin') }}"></script>
+
     <script type="text/javascript">
         $(function () {
-            var oldRanks = [];
-            // 画面の中のrank一覧を保持
-            $("div.item_list .item_box").each(function() {
-                oldRanks.push(this.dataset.rank);
+            // 初期表示時のsort noを保持.
+            var oldSortNos = [];
+            $('.sortable-item').each(function () {
+                oldSortNos.push(this.dataset.sortNo);
             });
-            // reverse sort
-            oldRanks.sort(function(a,b){return a - b;}).reverse();
-
-            $("div.item_list").sortable({
-                items: '.item_box',
-                cursor: 'move',
-                update: function(e, ui) {
-                    $("body").append($('<div class="modal-backdrop in"></div>'));
-                    updateRank();
-                }
-            });
-
-            var updateRank = function() {
-                // 並び替え後にrankを更新
-                var newRanks = {};
+            oldSortNos.sort(function (a, b) {
+                return a - b;
+            }).reverse();
+            // 並び替え後にsort noを更新
+            var updateSortNo = function () {
+                var newSortNos = {};
                 var i = 0;
-                $("div.item_list .item_box").each(function() {
-                    newRanks[this.dataset.recommendId] = oldRanks[i];
+                $('.sortable-item').each(function () {
+                    newSortNos[this.dataset.id] = oldSortNos[i];
                     i++;
                 });
                 $.ajax({
-                    url: '{{ url('admin_recommend_rank_move') }}',
+                    url: '{{ url('plugin_recommend_rank_move') }}',
                     type: 'POST',
-                    data: newRanks
-                }).done(function(data) {
-                    $(".modal-backdrop").remove();
-                }).fail(function(data) {
-                    alert('Error!!');
+                    data: newSortNos
+                }).always(function () {
                     $(".modal-backdrop").remove();
                 });
             };
+
+            // オーバレイ後, 表示順の更新を行う
+            var moveSortNo = function () {
+                $('body').append($('<div class="modal-backdrop show"></div>'));
+                updateSortNo();
+            };
+            // Drag and Drop
+            $(".sortable-container").sortable({
+                items: '> .sortable-item',
+                cursor: 'move',
+                update: function (e, ui) {
+                    moveSortNo();
+                }
+            });
         })
     </script>
 {% endblock javascript %}
 
 {% block main %}
-<form name="search_form" id="search_form" method="post" action="">
-    <div class="row">
-        <div class="col-md-12">
-            <div id="sortable_list" class="box">
-                <div class="box-header with-arrow">
-                    <h3 class="box-title"><span class="normal"><strong>{{ total_item_count }} 件</strong> が該当しました</span></h3>
-                </div><!-- /.box-header -->
+    <div class="c-contentsArea__cols">
+        <div class="c-contentsArea__primaryCol">
+            <div class="c-primaryCol">
+                <div class="card rounded border-0 mb-4">
+                    <div class="card-header"><span class="normal"><strong>{{ total_item_count }} 件</strong> が該当しました</span></div>
+                    <div class="card-body p-0">
 
-                {% if pagination %}
-                <div id="sortable_list_box" class="box-body no-padding no-border">
-                    <div class="sortable_list">
-                        <div class="item_list">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <colgroup>
-                                        <col width="2%">
-                                        <col>
-                                        <col width="10%">
-                                        <col>
-                                        <col width="5%">
-                                    </colgroup>
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>商品画像</th>
-                                            <th>商品名</th>
-                                            <th>説明文</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for RecommendProduct in pagination %}
-                                    <tr class="item_box tr" data-rank="{{ RecommendProduct.rank }}" data-recommend-id="{{ RecommendProduct.id }}">
-                                            <td class="icon_sortable td">
-                                                <svg class="cb cb-ellipsis-v"> <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cb-ellipsis-v"></use></svg>
-                                            </td>
-                                        <td id="product_image" class="item_photo td">
+                        {% if pagination %}
+                            <ul class="list-group list-group-flush sortable-container">
+                                <li class="list-group-item">
+                                    <div class="row justify-content-around">
+                                        <div class="col-auto"><strong>&nbsp;&nbsp;</strong></div>
+                                        <div class="col-2"><strong>商品画像</strong></div>
+                                        <div class="col-2"><strong>商品名</strong></div>
+                                        <div class="col-auto"><strong>説明文</strong></div>
+                                        <div class="col"><strong></strong></div>
+                                    </div>
+                                </li>
+                                {% for RecommendProduct in pagination %}
+                                    <li class="list-group-item sortable-item" data-sort-no="{{ RecommendProduct.sort_no }}" data-id="{{ RecommendProduct.id }}">
+                                        <div class="row justify-content-around">
+                                            <div class="col-auto d-flex align-items-center"><i class="fa fa-bars text-ec-gray"></i></div>
 
-                                            <a href="{{ url('admin_recommend_edit', { id : RecommendProduct.id }) }}" >
-                                                <img src="{{ app.config.image_save_urlpath }}/{{ RecommendProduct.Product.mainFileName|no_image_product }}"/>
-                                            </a>
-                                        </td>
-                                        <td class="product_name">
-                                            <a href="{{ url('admin_recommend_edit', { id : RecommendProduct.id }) }}" >
-                                                {{ RecommendProduct.Product.name }}
-                                                <br>
-                                                {{ RecommendProduct.Product.code_min }}
-                                                {% if RecommendProduct.Product.code_min != RecommendProduct.Product.code_max %} ～ {{ RecommendProduct.Product.code_max }}
-                                                {% endif %}
-                                            </a>
-                                        </td>
-                                        <td class="comment">{{ RecommendProduct.comment|raw|nl2br }}</td>
-                                        <td class="icon_edit">
-                                            <div class="dropdown">
-                                                <a class="dropdown-toggle" data-toggle="dropdown"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>
-                                                <ul class="dropdown-menu dropdown-menu-right">
-                                                    <li>
-                                                        <a href="{{ url('admin_recommend_edit', { id : RecommendProduct.id }) }}" >編集</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ url('admin_recommend_delete', {'id' : RecommendProduct.id}) }}" {{ csrf_token_for_anchor() }} data-method="delete" data-message="{{ 'admin.plugin.recommend.delete.confirm'|trans }}">削除</a>
-                                                    </li>
-                                                </ul>
+                                            <div class="col-2">
+                                                <a href="{{ url('plugin_recommend_edit', { id : RecommendProduct.id }) }}" >
+                                                    <img src="{{ asset(RecommendProduct.Product.mainFileName|no_image_product, 'save_image') }}" style="max-width: 100px;"/>
+                                                </a>
                                             </div>
-                                        </td>
-                                   </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                            <div class="col-2 d-flex align-items-center">
+                                                <a href="{{ url('plugin_recommend_edit', { id : RecommendProduct.id }) }}" >
+                                                    {{ RecommendProduct.Product.name }}
+                                                    <br>
+                                                    {{ RecommendProduct.Product.code_min }}
+                                                    {% if RecommendProduct.Product.code_min != RecommendProduct.Product.code_max %} ～ {{ RecommendProduct.Product.code_max }}
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                            <div class="col-3 d-flex">{{ RecommendProduct.comment|raw|nl2br }}</div>
+
+                                            <div class="col text-right">
+                                                <a href="{{ url('plugin_recommend_edit', { id : RecommendProduct.id }) }}"
+                                                   class="btn btn-ec-actionIcon mr-3 action-edit"
+                                                   data-toggle="tooltip"
+                                                   data-placement="top"
+                                                   title="{{ 'common.label.edit'|trans }}"><i
+                                                            class="fa fa-pencil fa-lg text-secondary"></i></a>
+                                                <a
+                                                        class="btn btn-ec-actionIcon mr-3"
+                                                        data-toggle="modal"
+                                                        data-target="#confirmModal-{{ RecommendProduct.id }}"
+                                                        data-tooltip="tooltip"
+                                                        data-placement="top"
+                                                        title="{{ 'common.label.delete'|trans }}"><i
+                                                            class="fa fa-close fa-lg text-secondary"></i></a>
+                                            </div>
+
+                                            <div class="modal fade" id="confirmModal-{{ RecommendProduct.id }}" tabindex="-1"
+                                                 role="dialog"
+                                                 aria-labelledby="confirmModal-{{ RecommendProduct.id }}" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title font-weight-bold">
+                                                                {{ 'admin.plugin.coupon.index.delete.confirm'|trans }}</h5>
+                                                            <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body text-left">
+                                                            <p class="text-left">
+                                                                {{ 'admin.plugin.coupon.index.delete.confirm'|trans }}</p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-ec-sub" type="button"
+                                                                    data-dismiss="modal">{{ 'common.label.cancel'|trans }}
+                                                            </button>
+                                                            <a href="{{ url('plugin_recommend_delete', {'id' : RecommendProduct.id}) }}" class="btn btn-ec-delete" data-confirm="false" {{ csrf_token_for_anchor() }} data-method="delete">
+                                                                {{ 'common.label.delete'|trans }}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div><!-- /.box -->
+                </div><!-- /.col -->
+
+                <p>{{'admin.setting.shop.payment.notice'|trans}}</p>
+
+            </div>
+
+            <div class="card rounded border-0">
+                <div class="card-body p-4">
+                    <div class="text-center">
+                        <a href="{{ url('plugin_recommend_new') }}" class="btn btn-ec-regular pl-4 pr-4">{{ 'おすすめ商品を新規登録'|trans }}</a>
                     </div>
-                </div><!-- /.box-body -->
-                {% endif %}
-            </div><!-- /.box -->
-        </div><!-- /.col -->
+                </div>
+            </div>
+
+        </div>
     </div>
-<div class="row">
-    <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 text-center btn_area">
-        <a href="{{ url('admin_recommend_new') }}" class="btn btn-primary btn-block btn-lg">おすすめ商品を新規登録</a>
-    </div>
-</div>
-</form>
 {% endblock %}

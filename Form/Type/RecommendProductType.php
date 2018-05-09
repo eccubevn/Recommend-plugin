@@ -10,7 +10,12 @@
 
 namespace Plugin\Recommend\Form\Type;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Eccube\Common\EccubeConfig;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -25,19 +30,26 @@ use Eccube\Form\DataTransformer;
 class RecommendProductType extends AbstractType
 {
     /**
-     * @var \Eccube\Application
+     * @var EccubeConfig
      */
-    private $app;
+    private $eccubeConfig;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
 
     /**
      * RecommendProductType constructor.
-     *
-     * @param \Silex\Application $app
+     * @param EccubeConfig $eccubeConfig
+     * @param EntityManagerInterface $entityManager
      */
-    public function __construct($app)
+    public function __construct(EccubeConfig $eccubeConfig, EntityManagerInterface $entityManager)
     {
-        $this->app = $app;
+        $this->eccubeConfig = $eccubeConfig;
+        $this->entityManager = $entityManager;
     }
+
 
     /**
      * Build config type form.
@@ -47,44 +59,41 @@ class RecommendProductType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $app = $this->app;
-
         $builder
-            ->add('id', 'text', array(
+            ->add('id', TextType::class, array(
                 'label' => '商品',
                 'required' => false,
                 'attr' => array('readonly' => 'readonly'),
             ))
-            ->add('comment', 'textarea', array(
+            ->add('comment', TextareaType::class, array(
                 'label' => '説明文',
                 'required' => true,
                 'trim' => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
                     new Assert\Length(array(
-                        'max' => $app['config']['text_area_len'],
+                        'max' => $this->eccubeConfig['text_area_len'],
                     )),
                 ),
                 'attr' => array(
-                    'maxlength' => $app['config']['text_area_len'],
-                    'placeholder' => $app->trans('plugin.recommend.type.comment.placeholder'),
+                    'maxlength' => $this->eccubeConfig['text_area_len'],
+                    'placeholder' => 'plugin.recommend.type.comment.placeholder',
                 ),
             ));
 
         $builder->add(
             $builder
-                ->create('Product', 'hidden')
-                ->addModelTransformer(new DataTransformer\EntityToIdTransformer($this->app['orm.em'], '\Eccube\Entity\Product'))
+                ->create('Product', HiddenType::class)
+                ->addModelTransformer(new DataTransformer\EntityToIdTransformer($this->entityManager, '\Eccube\Entity\Product'))
         );
 
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($app) {
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $form = $event->getForm();
             $data = $form->getData();
-
             // Check product
             $Product = $data['Product'];
             if (empty($Product)) {
-                $form['comment']->addError(new FormError($app->trans('plugin.recommend.type.product.not_found')));
+                $form['comment']->addError(new FormError('plugin.recommend.type.product.not_found'));
 
                 return;
             }
