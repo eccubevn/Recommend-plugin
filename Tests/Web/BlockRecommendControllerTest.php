@@ -11,24 +11,34 @@
 namespace Plugin\Recommend\Tests\Web;
 
 use Eccube\Common\Constant;
+use Eccube\Repository\ProductRepository;
 use Eccube\Tests\Web\AbstractWebTestCase;
+use Plugin\Recommend\Entity\RecommendProduct;
 
 /**
  * Class RecommendControllerTest.
  */
-class RecommendControllerTest extends AbstractWebTestCase
+class BlockRecommendControllerTest extends AbstractWebTestCase
 {
+    /**
+     * @var RecommendProduct
+     */
+    private $RecommendProduct1;
+    /**
+     * @var RecommendProduct
+     */
+    private $RecommendProduct2;
+
     /**
      * setUp.
      */
     public function setUp()
     {
         parent::setUp();
-
         // recommend for product 1 with rank 1
-        $this->initRecommendData(1, 1);
+        $this->RecommendProduct1 = $this->initRecommendData(1, 1);
         // recommend for product 2 with rank 2
-        $this->initRecommendData(2, 2);
+        $this->RecommendProduct2 = $this->initRecommendData(2, 2);
     }
 
     /**
@@ -38,11 +48,13 @@ class RecommendControllerTest extends AbstractWebTestCase
     {
         $crawler = $this->client->request(
             'GET',
-            $this->app->url('block_recommend_product_block')
+            $this->generateUrl('block_recommend_product_block')
         );
 
-        $this->assertContains('<div id="item_list">', $crawler->html());
+        $this->assertContains($this->RecommendProduct1->getProduct()->getName(), $crawler->html());
+        $this->assertContains($this->RecommendProduct2->getProduct()->getName(), $crawler->html());
     }
+
     /**
      * @param $productId
      * @param $rank
@@ -56,13 +68,13 @@ class RecommendControllerTest extends AbstractWebTestCase
 
         $Recommend = new \Plugin\Recommend\Entity\RecommendProduct();
         $Recommend->setComment($fake->word);
-        $Recommend->setProduct($this->app['eccube.repository.product']->find($productId));
+        $Recommend->setProduct($this->container->get(ProductRepository::class)->find($productId));
         $Recommend->setSortno($rank);
-        $Recommend->setVisible(Constant::DISABLED);
+        $Recommend->setVisible(Constant::ENABLED);
         $Recommend->setCreateDate($dateTime);
         $Recommend->setUpdateDate($dateTime);
-        $this->app['orm.em']->persist($Recommend);
-        $this->app['orm.em']->flush();
+        $this->entityManager->persist($Recommend);
+        $this->entityManager->flush();
 
         return $Recommend;
     }

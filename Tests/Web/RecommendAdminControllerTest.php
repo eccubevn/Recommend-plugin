@@ -11,7 +11,12 @@
 namespace Plugin\Recommend\Tests\Web;
 
 use Eccube\Common\Constant;
+use Eccube\Entity\Master\ProductStatus;
+use Eccube\Entity\Product;
+use Eccube\Repository\Master\ProductStatusRepository;
+use Eccube\Repository\ProductRepository;
 use Eccube\Tests\Web\Admin\AbstractAdminWebTestCase;
+use Plugin\Recommend\Repository\RecommendProductRepository;
 
 /**
  * Class RecommendAdminControllerTest.
@@ -21,12 +26,26 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     protected $Recommend1;
     protected $Recommend2;
     /**
+     * @var ProductRepository
+     */
+    protected $productRepo;
+
+    /**
+     * @var RecommendProductRepository
+     */
+    private $recommendProductRepository;
+
+    /**
      * please ensure have 1 or more order in database before testing.
      */
     public function setUp()
     {
         parent::setUp();
         $this->deleteAllRows(array('plg_recommend_product'));
+
+        $this->productRepo = $this->container->get(ProductRepository::class);
+        $this->recommendProductRepository = $this->container->get(RecommendProductRepository::class);
+
         // recommend for product 1 with rank 1
         $this->Recommend1 = $this->initRecommendData(1, 1);
         // recommend for product 2 with rank 2
@@ -40,7 +59,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     public function testRecommendListEmpty()
     {
         $this->deleteAllRows(array('plg_recommend_product'));
-        $crawler = $this->client->request('GET', $this->app->url('admin_recommend_list'));
+        $crawler = $this->client->request('GET', $this->generateUrl('plugin_recommend_list'));
         $this->assertContains('0 件', $crawler->html());
     }
 
@@ -48,16 +67,16 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
      * testRecommendList
      * none recommend.
      */
-    public function testRecommendList105()
+    public function testRecommendList()
     {
         $this->deleteAllRows(array('plg_recommend_product'));
-        for ($i = 1; $i < 106; ++$i) {
+        for ($i = 1; $i < 12; ++$i) {
             $Product = $this->createProduct();
             $this->initRecommendData($Product->getId(), $i);
         }
 
-        $crawler = $this->client->request('GET', $this->app->url('admin_recommend_list'));
-        $this->assertContains('105 件', $crawler->html());
+        $crawler = $this->client->request('GET', $this->generateUrl('plugin_recommend_list'));
+        $this->assertContains('11 件', $crawler->html());
     }
 
     /**
@@ -65,7 +84,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
      */
     public function testRecommendCreate()
     {
-        $crawler = $this->client->request('GET', $this->app->url('admin_recommend_new'));
+        $crawler = $this->client->request('GET', $this->generateUrl('plugin_recommend_new'));
         $this->assertContains('おすすめ商品管理', $crawler->html());
     }
 
@@ -74,12 +93,10 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
      */
     public function testRecommendNewEmpty()
     {
-        $this->deleteAllRows(array('plg_recommend_product'));
-
         $crawler = $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_new'),
-            array('admin_recommend' => array(
+            $this->generateUrl('plugin_recommend_new'),
+            array('recommend_product' => array(
                 '_token' => 'dummy',
                 'comment' => '',
                 'Product' => '',
@@ -87,8 +104,8 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
             )
         );
 
-        $this->assertContains('入力されていません。', $crawler->html());
-        $this->assertContains('商品を追加してください。', $crawler->html());
+        $this->assertContains('入力されていません。', $crawler->filter('.card-body')->html());
+        $this->assertContains('商品を追加してください。', $crawler->filter('.card-body')->html());
     }
 
     /**
@@ -96,12 +113,11 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
      */
     public function testRecommendNewProduct()
     {
-        $this->deleteAllRows(array('plg_recommend_product'));
         $productId = 1;
         $crawler = $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_new'),
-            array('admin_recommend' => array(
+            $this->generateUrl('plugin_recommend_new'),
+            array('recommend_product' => array(
                 '_token' => 'dummy',
                 'comment' => '',
                 'Product' => $productId,
@@ -109,7 +125,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
             )
         );
 
-        $this->assertContains('入力されていません。', $crawler->html());
+        $this->assertContains('入力されていません。', $crawler->filter('.card-body')->html());
     }
 
     /**
@@ -117,12 +133,11 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
      */
     public function testRecommendNewComment()
     {
-        $this->deleteAllRows(array('plg_recommend_product'));
         $fake = $this->getFaker();
         $crawler = $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_new'),
-            array('admin_recommend' => array(
+            $this->generateUrl('plugin_recommend_new'),
+            array('recommend_product' => array(
                 '_token' => 'dummy',
                 'comment' => $fake->word,
                 'Product' => '',
@@ -130,7 +145,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
             )
         );
 
-        $this->assertContains('商品を追加してください。', $crawler->html());
+        $this->assertContains('商品を追加してください。', $crawler->filter('.card-body')->html());
     }
 
     /**
@@ -138,14 +153,13 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
      */
     public function testRecommendNewCommentOver()
     {
-        $this->deleteAllRows(array('plg_recommend_product'));
         $fake = $this->getFaker();
         $productId = 1;
         $editMessage = $fake->text(99999);
         $crawler = $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_new'),
-            array('admin_recommend' => array(
+            $this->generateUrl('plugin_recommend_new'),
+            array('recommend_product' => array(
                 '_token' => 'dummy',
                 'comment' => $editMessage,
                 'Product' => $productId,
@@ -153,7 +167,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
             )
         );
 
-        $this->assertContains('値が長すぎます。4000文字以内でなければなりません。', $crawler->html());
+        $this->assertContains('値が長すぎます。4000文字以内でなければなりません。', $crawler->filter('.card-body')->html());
     }
 
     /**
@@ -167,8 +181,8 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         $editMessage = $fake->word;
         $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_new'),
-            array('admin_recommend' => array(
+            $this->generateUrl('plugin_recommend_new'),
+            array('recommend_product' => array(
                 '_token' => 'dummy',
                 'comment' => $editMessage,
                 'Product' => $productId,
@@ -176,7 +190,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
             )
         );
 
-        $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
+        $this->assertTrue($this->client->getResponse()->isRedirect($this->generateUrl('plugin_recommend_list')));
         $ProductNew = $this->getRecommend($productId);
 
         $this->expected = $editMessage;
@@ -187,42 +201,18 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     /**
      * RecommendSearchModelController.
      */
-    public function testAjaxSearchProductEmpty()
-    {
-        $crawler = $this->client->request(
-            'POST',
-            $this->app->url('admin_recommend_search_product', array('id' => '', 'category_id' => '', '_token' => 'dummy')),
-            array(),
-            array(),
-            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
-        );
-
-        $productList = $crawler->html();
-        $this->assertContains('ディナーフォーク', $productList);
-        $this->assertContains('パーコレーター', $productList);
-    }
-
-    /**
-     * RecommendSearchModelController.
-     */
     public function testAjaxSearchPublicProduct()
     {
-        $Disp = $this->app['orm.em']->getRepository('Eccube\Entity\Master\Disp')->find(1);
-        $Product = $this->app['eccube.repository.product']->findOneBy(array('name' => 'ディナーフォーク'));
-        $Product->setStatus($Disp);
-        $this->app['orm.em']->persist($Product);
-        $this->app['orm.em']->flush($Product);
-
         $crawler = $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_search_product', array('id' => '', 'category_id' => '', '_token' => 'dummy')),
+            $this->generateUrl('plugin_recommend_search_product', array('id' => '', 'category_id' => '', '_token' => 'dummy')),
             array(),
             array(),
             array('HTTP_X-Requested-With' => 'XMLHttpRequest')
         );
 
         $productList = $crawler->html();
-        $this->assertContains('ディナーフォーク', $productList);
+        $this->assertContains('パーコレーター', $productList);
     }
 
     /**
@@ -230,15 +220,15 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
      */
     public function testAjaxSearchUnpublicProduct()
     {
-        $Disp = $this->app['orm.em']->getRepository('Eccube\Entity\Master\Disp')->find(2);
-        $Product = $this->app['eccube.repository.product']->findOneBy(array('name' => 'ディナーフォーク'));
-        $Product->setStatus($Disp);
-        $this->app['orm.em']->persist($Product);
-        $this->app['orm.em']->flush($Product);
+        /** @var Product $Product */
+        $Product = $this->productRepo->findOneBy(array('name' => 'ディナーフォーク'));
+        $Product->setStatus($this->container->get(ProductStatusRepository::class)->find(ProductStatus::DISPLAY_HIDE));
+        $this->entityManager->persist($Product);
+        $this->entityManager->flush($Product);
 
         $crawler = $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_search_product', array('id' => '', 'category_id' => '', '_token' => 'dummy')),
+            $this->generateUrl('plugin_recommend_search_product', array('id' => 'ディナーフォーク', 'category_id' => '', '_token' => 'dummy')),
             array(),
             array(),
             array('HTTP_X-Requested-With' => 'XMLHttpRequest')
@@ -246,23 +236,6 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
 
         $productList = $crawler->html();
         $this->assertContains('ディナーフォーク', $productList);
-    }
-
-    /**
-     * RecommendSearchModelController.
-     */
-    public function testAjaxSearchProductValue()
-    {
-        $crawler = $this->client->request(
-            'POST',
-            $this->app->url('admin_recommend_search_product', array('id' => '', 'category_id' => 1, '_token' => 'dummy')),
-            array(),
-            array(),
-            array('HTTP_X-Requested-With' => 'XMLHttpRequest')
-        );
-
-        $productList = $crawler->html();
-        $this->assertContains('パーコレーター', $productList);
     }
 
     /**
@@ -272,7 +245,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     {
         $crawler = $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_search_product', array('id' => 'cafe-01', 'category_id' => '', '_token' => 'dummy')),
+            $this->generateUrl('plugin_recommend_search_product', array('id' => 'cafe-01', 'category_id' => '', '_token' => 'dummy')),
             array(),
             array(),
             array('HTTP_X-Requested-With' => 'XMLHttpRequest')
@@ -289,7 +262,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     {
         $crawler = $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_search_product', array('id' => 1, 'category_id' => '', '_token' => 'dummy')),
+            $this->generateUrl('plugin_recommend_search_product', array('id' => 1, 'category_id' => '', '_token' => 'dummy')),
             array(),
             array(),
             array('HTTP_X-Requested-With' => 'XMLHttpRequest')
@@ -306,7 +279,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     {
         $crawler = $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_search_product', array('id' => '', 'category_id' => 6, '_token' => 'dummy')),
+            $this->generateUrl('plugin_recommend_search_product', array('id' => '', 'category_id' => 3, '_token' => 'dummy')),
             array(),
             array(),
             array('HTTP_X-Requested-With' => 'XMLHttpRequest')
@@ -314,7 +287,6 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
 
         $productList = $crawler->html();
         $this->assertContains('ディナーフォーク', $productList);
-        $this->assertContains('パーコレーター', $productList);
     }
 
     /**
@@ -324,7 +296,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     {
         $recommendId = $this->Recommend2->getId();
 
-        $crawler = $this->client->request('GET', $this->app->url('admin_recommend_edit', array('id' => $recommendId)));
+        $crawler = $this->client->request('GET', $this->generateUrl('plugin_recommend_edit', array('id' => $recommendId)));
 
         $this->assertContains($this->Recommend2->getProduct()->getName(), $crawler->html());
     }
@@ -340,9 +312,9 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
 
         $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_edit', array('id' => $recommendId)),
+            $this->generateUrl('plugin_recommend_edit', array('id' => $recommendId)),
             array(
-                'admin_recommend' => array(
+                'recommend_product' => array(
                     '_token' => 'dummy',
                     'comment' => $editMessage,
                     'id' => $recommendId,
@@ -350,7 +322,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
                 ),
             )
         );
-        $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
+        $this->assertTrue($this->client->getResponse()->isRedirect($this->generateUrl('plugin_recommend_list')));
         $ProductNew = $this->getRecommend($productId);
 
         $this->expected = $editMessage;
@@ -370,11 +342,11 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         $recommendId = $this->Recommend2->getId();
         $editMessage = $fake->word;
 
-        $crawler = $this->client->request(
+        $this->client->request(
             'POST',
-            $this->app->url('admin_recommend_edit', array('id' => $recommendId)),
+            $this->generateUrl('plugin_recommend_edit', array('id' => $recommendId)),
             array(
-                'admin_recommend' => array(
+                'recommend_product' => array(
                     '_token' => 'dummy',
                     'comment' => $editMessage,
                     'id' => $recommendId,
@@ -382,7 +354,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
                 ),
             )
         );
-        $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
+        $this->assertTrue($this->client->getResponse()->isRedirect($this->generateUrl('plugin_recommend_list')));
     }
 
     /**
@@ -390,16 +362,16 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
      */
     public function testRecommendDelete()
     {
-        $productId = $this->Recommend1->getId();
+        $recommendId = $this->Recommend1->getId();
         $this->client->request(
             'DELETE',
-            $this->app->url('admin_recommend_delete', array('id' => $productId))
+            $this->generateUrl('plugin_recommend_delete', array('id' => $recommendId))
         );
-        $this->assertTrue($this->client->getResponse()->isRedirect($this->app->url('admin_recommend_list')));
-        $ProductNew = $this->app['eccube.plugin.recommend.repository.recommend_product']->find($productId);
+        $this->assertTrue($this->client->getResponse()->isRedirect($this->generateUrl('plugin_recommend_list')));
+        $ProductNew = $this->recommendProductRepository->find($recommendId);
 
-        $this->expected = 1;
-        $this->actual = $ProductNew->getDelFlg();
+        $this->expected = Constant::DISABLED;
+        $this->actual = $ProductNew->getVisible();
         $this->verify();
     }
 
@@ -410,9 +382,9 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
      */
     private function getRecommend($productId)
     {
-        $Product = $this->app['eccube.repository.product']->find($productId);
+        $Product = $this->productRepo->find($productId);
 
-        return $this->app['eccube.plugin.recommend.repository.recommend_product']->findOneBy(array('Product' => $Product));
+        return $this->recommendProductRepository->findOneBy(array('Product' => $Product));
     }
 
     /**
@@ -428,13 +400,13 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
 
         $Recommend = new \Plugin\Recommend\Entity\RecommendProduct();
         $Recommend->setComment($fake->word);
-        $Recommend->setProduct($this->app['eccube.repository.product']->find($productId));
+        $Recommend->setProduct($this->productRepo->find($productId));
         $Recommend->setSortno($rank);
-        $Recommend->setVisible(Constant::DISABLED);
+        $Recommend->setVisible(Constant::ENABLED);
         $Recommend->setCreateDate($dateTime);
         $Recommend->setUpdateDate($dateTime);
-        $this->app['orm.em']->persist($Recommend);
-        $this->app['orm.em']->flush();
+        $this->entityManager->persist($Recommend);
+        $this->entityManager->flush();
 
         return $Recommend;
     }

@@ -92,7 +92,7 @@ class RecommendProductType extends AbstractType
             // Check product
             $Product = $data['Product'];
             if (empty($Product)) {
-                $form['comment']->addError(new FormError('admin.plugin.recommend.type.product.not_found'));
+                $form['comment']->addError(new FormError(trans('admin.plugin.recommend.type.product.not_found')));
 
                 return;
             }
