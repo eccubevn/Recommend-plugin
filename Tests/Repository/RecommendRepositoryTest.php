@@ -11,7 +11,6 @@
 namespace Plugin\Recommend\Tests\Repository;
 
 use Eccube\Common\Constant;
-use Eccube\Entity\Product;
 use Eccube\Repository\ProductRepository;
 use Eccube\Tests\Web\Admin\AbstractAdminWebTestCase;
 use Plugin\Recommend\Entity\RecommendProduct;

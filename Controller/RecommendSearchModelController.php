@@ -16,6 +16,7 @@ use Eccube\Repository\CategoryRepository;
 use Eccube\Repository\ProductRepository;
 use Knp\Component\Pager\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -53,6 +54,7 @@ class RecommendSearchModelController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\Response|null
      * @Route("/%eccube_admin_route%/plugin/recommend/search/product", name="plugin_recommend_search_product")
      * @Route("/%eccube_admin_route%/plugin/recommend/search/product/page/{page_no}", requirements={"page_no" = "\d+"}, name="plugin_recommend_search_product_page")
+     * @Template("Recommend/Resource/template/admin/search_product.twig")
      */
     public function searchProduct(Request $request, $page_no = null, Paginator $paginator)
     {
@@ -110,8 +112,8 @@ class RecommendSearchModelController extends AbstractController
             log_debug('Search product not found.');
         }
 
-        return $this->render('Recommend/Resource/template/admin/search_product.twig', array(
+        return array(
             'pagination' => $pagination,
-        ));
+        );
     }
 }

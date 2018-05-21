@@ -19,6 +19,7 @@ use Plugin\Recommend\Service\RecommendService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,17 +56,18 @@ class RecommendController extends AbstractController
      *
      * @param Request     $request
      *
-     * @return Response
+     * @return []
      * @Route("/%eccube_admin_route%/plugin/recommend/", name="plugin_recommend_list")
+     * @Template("Recommend/Resource/template/admin/index.twig")
      */
     public function index(Request $request)
     {
         $pagination = $this->recommendProductRepository->getRecommendList();
 
-        return $this->render('Recommend/Resource/template/admin/index.twig', array(
+        return array(
             'pagination' => $pagination,
             'total_item_count' => count($pagination),
-        ));
+        );
     }
 
     /**
@@ -74,9 +76,10 @@ class RecommendController extends AbstractController
      * @param Request     $request
      * @param int         $id
      * @throws \Exception
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return array
      * @Route("/%eccube_admin_route%/plugin/recommend/new", name="plugin_recommend_new")
      * @Route("/%eccube_admin_route%/plugin/recommend/{id}/edit", name="plugin_recommend_edit", requirements={"id" = "\d+"})
+     * @Template("Recommend/Resource/template/admin/regist.twig")
      */
     public function edit(Request $request, $id = null)
     {
@@ -196,7 +199,7 @@ class RecommendController extends AbstractController
      *
      * @param array       $parameters
      *
-     * @return Response
+     * @return array
      */
     protected function registerView($parameters = array())
     {
@@ -207,6 +210,6 @@ class RecommendController extends AbstractController
         );
         $viewParameters += $parameters;
 
-        return $this->render('Recommend/Resource/template/admin/regist.twig', $viewParameters);
+        return $viewParameters;
     }
 }
