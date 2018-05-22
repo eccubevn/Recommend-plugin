@@ -23,7 +23,7 @@ class Nav implements EccubeNav
         return [
             'content' => [
                 'id' => 'plugin_recommend',
-                'name' => 'おすすめ管理',
+                'name' => 'admin.plugin.recommend.navi',
                 'url' => 'plugin_recommend_list'
             ]
         ];
