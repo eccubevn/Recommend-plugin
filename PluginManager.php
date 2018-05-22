@@ -10,13 +10,22 @@
 
 namespace Plugin\Recommend;
 
+use Eccube\Application;
 use Eccube\Common\Constant;
 use Eccube\Entity\Block;
 use Eccube\Entity\BlockPosition;
+use Eccube\Entity\Layout;
 use Eccube\Entity\Master\DeviceType;
+use Eccube\Entity\Page;
 use Eccube\Entity\PageLayout;
 use Eccube\Plugin\AbstractPluginManager;
+use Eccube\Repository\BlockPositionRepository;
+use Eccube\Repository\BlockRepository;
+use Eccube\Repository\LayoutRepository;
+use Eccube\Repository\Master\DeviceTypeRepository;
 use Eccube\Util\Cache;
+use Eccube\Util\CacheUtil;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -49,103 +58,86 @@ class PluginManager extends AbstractPluginManager
     }
 
     /**
-     * @param array               $config
-     * @param \Eccube\Application $app
+     * @param null $meta
+     * @param Application|null $app
+     * @param ContainerInterface $container
+     * @throws \Exception
      */
-    public function install($config, $app)
+    public function uninstall($meta = null, Application $app = null, ContainerInterface $container)
     {
+        // ブロックの削除
+        $this->removeDataBlock($container);
     }
 
     /**
-     * @param array               $config
-     * @param \Eccube\Application $app
+     * @param null $meta
+     * @param Application|null $app
+     * @param ContainerInterface $container
+     * @throws \Exception
      */
-    public function uninstall($config, $app)
+    public function enable($meta = null, Application $app = null, ContainerInterface $container)
     {
-        // ブロックの削除
-        $this->removeDataBlock($app);
-
-        if (file_exists($app['config']['block_realdir'].'/'.$this->blockFileName.'.twig')) {
-            $this->removeBlock($app);
+        $this->copyBlock($container);
+        $Block = $container->get(BlockRepository::class)->findOneBy(array('file_name' => $this->blockFileName));
+        if (is_null($Block)) {
+            // pagelayoutの作成
+            $this->createDataBlock($container);
         }
-
-        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
     }
 
     /**
-     * @param array               $config
-     * @param \Eccube\Application $app
+     * @param null $meta
+     * @param Application|null $app
+     * @param ContainerInterface $container
+     * @throws \Exception
      */
-    public function enable($config, $app)
+    public function disable($meta = null, Application $app = null, ContainerInterface $container)
     {
-        $this->copyBlock($app);
-        // ブロックへ登録
-        $this->createDataBlock($app);
-
-        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code']);
+        $this->removeBlock($container);
     }
 
     /**
-     * @param array               $config
-     * @param \Eccube\Application $app
+     * @param null $meta
+     * @param Application|null $app
+     * @param ContainerInterface $container
      */
-    public function disable($config, $app)
+    public function update($meta = null, Application $app = null, ContainerInterface $container)
     {
-        $this->removeBlock($app);
-        // ブロックの削除
-        $this->removeDataBlock($app);
-    }
-
-    /**
-     * @param array               $config
-     * @param \Eccube\Application $app
-     */
-    public function update($config, $app)
-    {
-        $this->copyBlock($app);
-
-        $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code']);
+        $this->copyBlock($container);
     }
 
     /**
      * ブロックを登録.
      *
-     * @param \Eccube\Application $app
+     * @param ContainerInterface $container
      *
      * @throws \Exception
      */
-    private function createDataBlock($app)
+    private function createDataBlock(ContainerInterface $container)
     {
-        $em = $app['orm.em'];
+        $em = $container->get('doctrine.orm.entity_manager');
+        $DeviceType = $container->get(DeviceTypeRepository::class)->find(DeviceType::DEVICE_TYPE_PC);
 
         try {
-            $DeviceType = $app['eccube.repository.master.device_type']->find(DeviceType::DEVICE_TYPE_PC);
-
-            // check exists block
             /** @var Block $Block */
-            $Block = $app['eccube.repository.block']->findOneBy(array('DeviceType' => $DeviceType, 'file_name' => $this->blockFileName));
-            if (!$Block) {
-                /** @var Block $Block */
-                $Block = $app['eccube.repository.block']->findOrCreate(null, $DeviceType);
+            $Block = $container->get(BlockRepository::class)->newBlock($DeviceType);
 
-                // Blockの登録
-                $Block->setName($this->blockName)
-                    ->setFileName($this->blockFileName)
-                    ->setDeletableFlg(Constant::DISABLED)
-                    ->setLogicFlg(1);
-                $em->persist($Block);
-                $em->flush($Block);
-            }
+            // Blockの登録
+            $Block->setName($this->blockName)
+                ->setFileName($this->blockFileName)
+                ->setUseController(Constant::ENABLED);
+            $em->persist($Block);
+            $em->flush($Block);
 
             // check exists block position
-            $blockPos = $em->getRepository('Eccube\Entity\BlockPosition')->findOneBy(array('block_id' => $Block->getId()));
+            $blockPos = $container->get(BlockPositionRepository::class)->findOneBy(array('Block' => $Block));
             if ($blockPos) {
                 return;
             }
 
             // BlockPositionの登録
-            $blockPos = $em->getRepository('Eccube\Entity\BlockPosition')->findOneBy(
-                array('page_id' => 1, 'target_id' => PageLayout::TARGET_ID_MAIN_BOTTOM),
+            $blockPos = $container->get(BlockPositionRepository::class)->findOneBy(
+                array('section' => Page::TARGET_ID_MAIN_BOTTOM, 'layout_id' => Layout::DEFAULT_LAYOUT_UNDERLAYER_PAGE),
                 array('block_row' => 'DESC')
             );
 
@@ -158,14 +150,13 @@ class PluginManager extends AbstractPluginManager
                 $BlockPosition->setBlockRow($blockRow);
             }
 
-            $PageLayout = $app['eccube.repository.page_layout']->find(1);
+            $LayoutDefault = $container->get(LayoutRepository::class)->find(Layout::DEFAULT_LAYOUT_UNDERLAYER_PAGE);
 
-            $BlockPosition->setPageLayout($PageLayout)
-                ->setPageId($PageLayout->getId())
-                ->setTargetId(PageLayout::TARGET_ID_MAIN_BOTTOM)
+            $BlockPosition->setLayout($LayoutDefault)
+                ->setLayoutId($LayoutDefault->getId())
+                ->setSection(Page::TARGET_ID_MAIN_BOTTOM)
                 ->setBlock($Block)
-                ->setBlockId($Block->getId())
-                ->setAnywhere(Constant::ENABLED);
+                ->setBlockId($Block->getId());
 
             $em->persist($BlockPosition);
             $em->flush($BlockPosition);
@@ -177,23 +168,21 @@ class PluginManager extends AbstractPluginManager
     /**
      * ブロックを削除.
      *
-     * @param \Eccube\Application $app
+     * @param ContainerInterface $container
      *
      * @throws \Exception
      */
-    private function removeDataBlock($app)
+    private function removeDataBlock(ContainerInterface $container)
     {
         // Blockの取得(file_nameはアプリケーションの仕組み上必ずユニーク)
         /** @var \Eccube\Entity\Block $Block */
-        $Block = $app['eccube.repository.block']->findOneBy(array('file_name' => $this->blockFileName));
+        $Block = $container->get(BlockRepository::class)->findOneBy(array('file_name' => $this->blockFileName));
 
         if (!$Block) {
-            Cache::clear($app, false);
-
             return;
         }
 
-        $em = $app['orm.em'];
+        $em = $container->get('doctrine.orm.entity_manager');
         try {
             // BlockPositionの削除
             $blockPositions = $Block->getBlockPositions();
@@ -209,31 +198,31 @@ class PluginManager extends AbstractPluginManager
         } catch (\Exception $e) {
             throw $e;
         }
-
-        Cache::clear($app, false);
     }
 
     /**
      * Copy block template.
      *
-     * @param $app
+     * @param ContainerInterface $container
      */
-    private function copyBlock($app)
+    private function copyBlock(ContainerInterface $container)
     {
+        $templateDir = $container->getParameter('eccube_theme_front_dir');
         // ファイルコピー
         $file = new Filesystem();
         // ブロックファイルをコピー
-        $file->copy($this->originBlock, $app['config']['block_realdir'].'/'.$this->blockFileName.'.twig');
+        $file->copy($this->originBlock, $templateDir.'/Block/'.$this->blockFileName.'.twig');
     }
 
     /**
      * Remove block template.
      *
-     * @param $app
+     * @param ContainerInterface $container
      */
-    private function removeBlock($app)
+    private function removeBlock(ContainerInterface $container)
     {
+        $templateDir = $container->getParameter('eccube_theme_front_dir');
         $file = new Filesystem();
-        $file->remove($app['config']['block_realdir'].'/'.$this->blockFileName.'.twig');
+        $file->remove($templateDir.'/Block/'.$this->blockFileName.'.twig');
     }
 }
