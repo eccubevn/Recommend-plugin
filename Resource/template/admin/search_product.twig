@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
 #}
 
-<script>
+<script type="text/javascript">
     function fnSelectProduct($row, product_id, product_name, product_image_link, product_image_img, product_code_min, product_code_max) {
         // Add product argument
         var productName = $('#product_name');
@@ -32,10 +32,13 @@
         productCode.removeClass('d-none');
 
         // Check product exist
+        console.log(product_id);
+        console.log(recommend);
+        console.log(recommend.indexOf(product_id));
         var warning = $('#warning');
         warning.text('');
         if (recommend.indexOf(product_id) != -1) {
-            warning.text("{{ 'admin.plugin.recommend.edit.existed'|trans }}");
+            warning.text("{{ 'plugin_recommend.admin.edit.existed'|trans }}");
         }
 
         // モーダル閉じる.
@@ -89,7 +92,7 @@
     {% if pagination.totalItemCount > 0 %}
     <div class="col box-footer">
         <div class="row justify-content-md-center mb-4">
-            {% include "@admin/styleguide_pager.twig" with {'pages': pagination.paginationData, 'routes': 'plugin_recommend_search_product_page'} %}
+            {% include "@admin/pager.twig" with {'pages': pagination.paginationData, 'routes': 'plugin_recommend_search_product_page'} %}
         </div>
     </div>
     {% endif %}

@@ -1,8 +1,11 @@
 <?php
+
 /*
- * This file is part of the Recommend Product plugin
+ * This file is part of EC-CUBE
  *
- * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
+ * Copyright(c) LOCKON CO.,LTD. All Rights Reserved.
+ *
+ * http://www.lockon.co.jp/
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -41,6 +44,7 @@ class RecommendProductType extends AbstractType
 
     /**
      * RecommendProductType constructor.
+     *
      * @param EccubeConfig $eccubeConfig
      * @param EntityManagerInterface $entityManager
      */
@@ -59,26 +63,26 @@ class RecommendProductType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('id', TextType::class, array(
-                'label' => 'admin.plugin.recommend.edit.product',
+            ->add('id', TextType::class, [
+                'label' => 'plugin_recommend.admin.edit.product',
                 'required' => false,
-                'attr' => array('readonly' => 'readonly'),
-            ))
-            ->add('comment', TextareaType::class, array(
-                'label' => 'admin.plugin.recommend.edit.comment',
+                'attr' => ['readonly' => 'readonly'],
+            ])
+            ->add('comment', TextareaType::class, [
+                'label' => 'plugin_recommend.admin.edit.comment',
                 'required' => true,
                 'trim' => true,
-                'constraints' => array(
+                'constraints' => [
                     new Assert\NotBlank(),
-                    new Assert\Length(array(
-                        'max' => $this->eccubeConfig['text_area_len'],
-                    )),
-                ),
-                'attr' => array(
-                    'maxlength' => $this->eccubeConfig['text_area_len'],
-                    'placeholder' => 'admin.plugin.recommend.type.comment.placeholder',
-                ),
-            ));
+                    new Assert\Length([
+                        'max' => $this->eccubeConfig['plugin_recommend.text_area_len'],
+                    ]),
+                ],
+                'attr' => [
+                    'maxlength' => $this->eccubeConfig['plugin_recommend.text_area_len'],
+                    'placeholder' => 'plugin_recommend.admin.type.comment.placeholder',
+                ],
+            ]);
 
         $builder->add(
             $builder
@@ -92,7 +96,7 @@ class RecommendProductType extends AbstractType
             // Check product
             $Product = $data['Product'];
             if (empty($Product)) {
-                $form['comment']->addError(new FormError(trans('admin.plugin.recommend.type.product.not_found')));
+                $form['comment']->addError(new FormError(trans('plugin_recommend.admin.type.product.not_found')));
 
                 return;
             }
@@ -106,9 +110,9 @@ class RecommendProductType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'data_class' => 'Plugin\Recommend\Entity\RecommendProduct',
-        ));
+        ]);
     }
 
     /**

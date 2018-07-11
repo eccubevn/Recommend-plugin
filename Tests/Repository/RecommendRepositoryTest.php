@@ -1,8 +1,11 @@
 <?php
+
 /*
- * This file is part of the Recommend plugin
+ * This file is part of EC-CUBE
  *
- * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
+ * Copyright(c) LOCKON CO.,LTD. All Rights Reserved.
+ *
+ * http://www.lockon.co.jp/
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,7 +13,6 @@
 
 namespace Plugin\Recommend\Tests\Repository;
 
-use Eccube\Common\Constant;
 use Eccube\Repository\ProductRepository;
 use Eccube\Tests\Web\Admin\AbstractAdminWebTestCase;
 use Plugin\Recommend\Entity\RecommendProduct;
@@ -47,7 +49,7 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->deleteAllRows(array('plg_recommend_product'));
+        $this->deleteAllRows(['plg_recommend_product']);
         $this->recommendProductRepository = $this->container->get(RecommendProductRepository::class);
         $this->productRepository = $this->container->get(ProductRepository::class);
 
@@ -110,10 +112,10 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
      */
     public function testMoveRecommendRank()
     {
-        $arrRecommend = array(
+        $arrRecommend = [
             $this->Recommend->getId() => 2,
             $this->Recommend2->getId() => 1,
-        );
+        ];
         $arrRankMoved = $this->recommendProductRepository->moveRecommendRank($arrRecommend);
 
         $this->expected = $arrRecommend[$this->Recommend->getId()];
@@ -128,10 +130,11 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
     {
         $productIdAll = $this->recommendProductRepository->getRecommendProductIdAll();
 
-        $this->expected = [1,2];
+        $this->expected = [1, 2];
         $this->actual = $productIdAll;
         $this->verify();
     }
+
     /**
      * function : deleteRecommend.
      */
@@ -159,7 +162,7 @@ class RecommendRepositoryTest extends AbstractAdminWebTestCase
         $Recommend->setComment($fake->word);
         $Recommend->setProduct($this->productRepository->find($productId));
         $Recommend->setSortno($rank);
-        $Recommend->setVisible(Constant::ENABLED);
+        $Recommend->setVisible(true);
         $Recommend->setCreateDate($dateTime);
         $Recommend->setUpdateDate($dateTime);
         $this->entityManager->persist($Recommend);

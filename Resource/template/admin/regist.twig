@@ -6,12 +6,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
 #}
-{% extends '@admin/styleguide_frame.twig' %}
+{% extends '@admin/default_frame.twig' %}
 
 {% set menus = ['content', 'plugin_recommend'] %}
 
-{% block title %}{{ 'admin.plugin.recommend.edit.title'|trans }}{% endblock %}
-{% block sub_title %}{{ 'admin.plugin.recommend.edit.subtitle'|trans }}{% endblock %}
+{% block title %}{{ 'plugin_recommend.admin.edit.title'|trans }}{% endblock %}
+{% block sub_title %}{{ 'plugin_recommend.admin.edit.subtitle'|trans }}{% endblock %}
 
 {% form_theme form '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
 {% form_theme searchProductModalForm '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
@@ -26,7 +26,7 @@
 
 {% block javascript %}
     <script type="text/javascript">
-        var recommend = '{{ recommend_products|raw }}';
+        var recommend = JSON.parse('{{ recommend_products|raw }}');
 
         $(function() {
             $('#showSearchProductModal').on('click', function() {
@@ -69,7 +69,7 @@
                 <div class="c-primaryCol">
                     <div class="card rounded border-0 mb-4">
                         <div class="card-header">
-                            <span>{{ 'admin.plugin.recommend.edit.header'|trans }}</span>
+                            <span>{{ 'plugin_recommend.admin.edit.header'|trans }}</span>
                         </div><!-- /.box-header -->
 
                         <div class="card-body">
@@ -111,7 +111,7 @@
                                         <p id="product_code" class="d-none"></p>
                                     {% endif %}
 
-                                    <a id="showSearchProductModal" class="btn btn-ec-regular mr-2" data-toggle="modal" data-target="#searchProductModal">{{ 'admin.plugin.recommend.edit.search'|trans }}</a>
+                                    <a id="showSearchProductModal" class="btn btn-ec-regular mr-2" data-toggle="modal" data-target="#searchProductModal">{{ 'plugin_recommend.admin.edit.search'|trans }}</a>
                                     <div class="clearfix"></div>
                                     {{ form_widget(form.Product) }}
                                     {{ form_errors(form.Product) }}
@@ -124,7 +124,7 @@
                                 <div class="col mb-2">
                                     {{ form_widget(form.comment, { attr : { rows : "8"} }) }}
                                     {{ form_errors(form.comment) }}
-                                    <p class="text-muted" style="text-align: right">{{ 'admin.plugin.recommend.edit.comment.help'|trans({'%number%' : eccube_config.text_area_len}) }}</p>
+                                    <p class="text-muted" style="text-align: right">{{ 'plugin_recommend.admin.edit.comment.help'|trans({'%number%' : eccube_config['plugin_recommend.text_area_len']}) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -165,7 +165,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="searchProductModalLabel">{{ 'admin.plugin.recommend.edit.product_search.header'|trans }}</h4>
+                    <h4 class="modal-title" id="searchProductModalLabel">{{ 'plugin_recommend.admin.edit.product_search.header'|trans }}</h4>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -179,7 +179,7 @@
                         {{ form_widget(searchProductModalForm.category_id) }}
                     </div>
                     <div class="form-group text-center">
-                        <button type="button" id="searchProductModalButton" class="btn btn-primary" >{{ 'admin.plugin.recommend.edit.product_search.button'|trans }}</button>
+                        <button type="button" id="searchProductModalButton" class="btn btn-primary" >{{ 'plugin_recommend.admin.edit.product_search.button'|trans }}</button>
                     </div>
                     <div class="form-group" id="searchProductModalList">
                     </div>

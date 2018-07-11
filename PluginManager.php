@@ -1,8 +1,11 @@
 <?php
+
 /*
- * This file is part of the Recommend Product plugin
+ * This file is part of EC-CUBE
  *
- * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
+ * Copyright(c) LOCKON CO.,LTD. All Rights Reserved.
+ *
+ * http://www.lockon.co.jp/
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,14 +20,11 @@ use Eccube\Entity\BlockPosition;
 use Eccube\Entity\Layout;
 use Eccube\Entity\Master\DeviceType;
 use Eccube\Entity\Page;
-use Eccube\Entity\PageLayout;
 use Eccube\Plugin\AbstractPluginManager;
 use Eccube\Repository\BlockPositionRepository;
 use Eccube\Repository\BlockRepository;
 use Eccube\Repository\LayoutRepository;
 use Eccube\Repository\Master\DeviceTypeRepository;
-use Eccube\Util\Cache;
-use Eccube\Util\CacheUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -61,6 +61,7 @@ class PluginManager extends AbstractPluginManager
      * @param null $meta
      * @param Application|null $app
      * @param ContainerInterface $container
+     *
      * @throws \Exception
      */
     public function uninstall($meta = null, Application $app = null, ContainerInterface $container)
@@ -73,12 +74,13 @@ class PluginManager extends AbstractPluginManager
      * @param null $meta
      * @param Application|null $app
      * @param ContainerInterface $container
+     *
      * @throws \Exception
      */
     public function enable($meta = null, Application $app = null, ContainerInterface $container)
     {
         $this->copyBlock($container);
-        $Block = $container->get(BlockRepository::class)->findOneBy(array('file_name' => $this->blockFileName));
+        $Block = $container->get(BlockRepository::class)->findOneBy(['file_name' => $this->blockFileName]);
         if (is_null($Block)) {
             // pagelayoutの作成
             $this->createDataBlock($container);
@@ -89,6 +91,7 @@ class PluginManager extends AbstractPluginManager
      * @param null $meta
      * @param Application|null $app
      * @param ContainerInterface $container
+     *
      * @throws \Exception
      */
     public function disable($meta = null, Application $app = null, ContainerInterface $container)
@@ -125,20 +128,20 @@ class PluginManager extends AbstractPluginManager
             // Blockの登録
             $Block->setName($this->blockName)
                 ->setFileName($this->blockFileName)
-                ->setUseController(Constant::ENABLED);
+                ->setUseController(Constant::DISABLED);
             $em->persist($Block);
             $em->flush($Block);
 
             // check exists block position
-            $blockPos = $container->get(BlockPositionRepository::class)->findOneBy(array('Block' => $Block));
+            $blockPos = $container->get(BlockPositionRepository::class)->findOneBy(['Block' => $Block]);
             if ($blockPos) {
                 return;
             }
 
             // BlockPositionの登録
             $blockPos = $container->get(BlockPositionRepository::class)->findOneBy(
-                array('section' => Page::TARGET_ID_MAIN_BOTTOM, 'layout_id' => Layout::DEFAULT_LAYOUT_UNDERLAYER_PAGE),
-                array('block_row' => 'DESC')
+                ['section' => Page::TARGET_ID_MAIN_BOTTOM, 'layout_id' => Layout::DEFAULT_LAYOUT_UNDERLAYER_PAGE],
+                ['block_row' => 'DESC']
             );
 
             $BlockPosition = new BlockPosition();
@@ -176,7 +179,7 @@ class PluginManager extends AbstractPluginManager
     {
         // Blockの取得(file_nameはアプリケーションの仕組み上必ずユニーク)
         /** @var \Eccube\Entity\Block $Block */
-        $Block = $container->get(BlockRepository::class)->findOneBy(array('file_name' => $this->blockFileName));
+        $Block = $container->get(BlockRepository::class)->findOneBy(['file_name' => $this->blockFileName]);
 
         if (!$Block) {
             return;

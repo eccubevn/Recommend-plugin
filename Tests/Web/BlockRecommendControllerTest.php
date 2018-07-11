@@ -1,8 +1,11 @@
 <?php
+
 /*
- * This file is part of the Recommend plugin
+ * This file is part of EC-CUBE
  *
- * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
+ * Copyright(c) LOCKON CO.,LTD. All Rights Reserved.
+ *
+ * http://www.lockon.co.jp/
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,7 +13,6 @@
 
 namespace Plugin\Recommend\Tests\Web;
 
-use Eccube\Common\Constant;
 use Eccube\Repository\ProductRepository;
 use Eccube\Tests\Web\AbstractWebTestCase;
 use Plugin\Recommend\Entity\RecommendProduct;
@@ -70,7 +72,7 @@ class BlockRecommendControllerTest extends AbstractWebTestCase
         $Recommend->setComment($fake->word);
         $Recommend->setProduct($this->container->get(ProductRepository::class)->find($productId));
         $Recommend->setSortno($rank);
-        $Recommend->setVisible(Constant::ENABLED);
+        $Recommend->setVisible(true);
         $Recommend->setCreateDate($dateTime);
         $Recommend->setUpdateDate($dateTime);
         $this->entityManager->persist($Recommend);

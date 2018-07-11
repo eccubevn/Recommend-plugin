@@ -1,8 +1,11 @@
 <?php
+
 /*
- * This file is part of the Recommend Product plugin
+ * This file is part of EC-CUBE
  *
- * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
+ * Copyright(c) LOCKON CO.,LTD. All Rights Reserved.
+ *
+ * http://www.lockon.co.jp/
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -26,6 +29,7 @@ class RecommendService
 
     /**
      * RecommendService constructor.
+     *
      * @param RecommendProductRepository $recommendProductRepository
      */
     public function __construct(RecommendProductRepository $recommendProductRepository)
@@ -33,12 +37,13 @@ class RecommendService
         $this->recommendProductRepository = $recommendProductRepository;
     }
 
-
     /**
      * おすすめ商品情報を新規登録する
      *
      * @param $data
+     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function createRecommend($data)
@@ -53,7 +58,9 @@ class RecommendService
      * おすすめ商品情報を更新する
      *
      * @param $data
+     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function updateRecommend($data)
@@ -76,7 +83,9 @@ class RecommendService
      * おすすめ商品情報を生成する
      *
      * @param $data
+     *
      * @return RecommendProduct
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -88,7 +97,7 @@ class RecommendService
         $Recommend->setComment($data['comment']);
         $Recommend->setProduct($data['Product']);
         $Recommend->setSortno(($rank ? $rank : 0) + 1);
-        $Recommend->setVisible(Constant::ENABLED);
+        $Recommend->setVisible((bool) Constant::ENABLED);
 
         return $Recommend;
     }

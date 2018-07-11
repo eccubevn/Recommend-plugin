@@ -1,8 +1,11 @@
 <?php
+
 /*
- * This file is part of the Recommend Product plugin
+ * This file is part of EC-CUBE
  *
- * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
+ * Copyright(c) LOCKON CO.,LTD. All Rights Reserved.
+ *
+ * http://www.lockon.co.jp/
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,6 +14,7 @@
 namespace Plugin\Recommend\Repository;
 
 use Eccube\Common\Constant;
+use Eccube\Entity\Master\ProductStatus;
 use Eccube\Repository\AbstractRepository;
 use Plugin\Recommend\Entity\RecommendProduct;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -42,7 +46,7 @@ class RecommendProductRepository extends AbstractRepository
     {
         $qb = $this->createQueryBuilder('rp')
             ->innerJoin('rp.Product', 'p');
-        $qb->where('rp.visible = ' . Constant::ENABLED);
+        $qb->where('rp.visible = '.(bool) Constant::ENABLED);
         $qb->addOrderBy('rp.sort_no', 'DESC');
 
         return $qb->getQuery()->getResult();
@@ -52,6 +56,7 @@ class RecommendProductRepository extends AbstractRepository
      * Get max rank.
      *
      * @return mixed
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -74,7 +79,7 @@ class RecommendProductRepository extends AbstractRepository
             ->innerJoin('Eccube\Entity\Product', 'p', 'WITH', 'p.id = rp.Product')
             ->where('p.Status = :Disp')
             ->orderBy('rp.sort_no', 'DESC')
-            ->setParameter('Disp', 1)
+            ->setParameter('Disp', ProductStatus::DISPLAY_SHOW)
             ->getQuery();
 
         return $query->getResult();
@@ -84,6 +89,7 @@ class RecommendProductRepository extends AbstractRepository
      * Number of recommend.
      *
      * @return mixed
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -99,13 +105,15 @@ class RecommendProductRepository extends AbstractRepository
      * Move rank.
      *
      * @param array $arrRank
+     *
      * @return array
+     *
      * @throws \Exception
      */
     public function moveRecommendRank(array $arrRank)
     {
         $this->getEntityManager()->beginTransaction();
-        $arrRankMoved = array();
+        $arrRankMoved = [];
         try {
             foreach ($arrRank as $recommendId => $rank) {
                 /* @var $Recommend RecommendProduct */
@@ -160,7 +168,7 @@ class RecommendProductRepository extends AbstractRepository
     {
         $query = $this->createQueryBuilder('rp')
             ->select('IDENTITY(rp.Product) as id')
-            ->where('rp.visible = '.Constant::ENABLED)
+            ->where('rp.visible = '.(bool) Constant::ENABLED)
             ->getQuery();
         $arrReturn = $query->getScalarResult();
 
@@ -171,13 +179,15 @@ class RecommendProductRepository extends AbstractRepository
      * おすすめ商品情報を削除する
      *
      * @param RecommendProduct $RecommendProduct
+     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function deleteRecommend(RecommendProduct $RecommendProduct)
     {
         // おすすめ商品情報を書き換える
-        $RecommendProduct->setVisible(Constant::DISABLED);
+        $RecommendProduct->setVisible((bool) Constant::DISABLED);
 
         // おすすめ商品情報を登録する
         return $this->saveRecommend($RecommendProduct);

@@ -1,8 +1,11 @@
 <?php
+
 /*
- * This file is part of the Recommend Product plugin
+ * This file is part of EC-CUBE
  *
- * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
+ * Copyright(c) LOCKON CO.,LTD. All Rights Reserved.
+ *
+ * http://www.lockon.co.jp/
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -36,6 +39,7 @@ class RecommendSearchModelController extends AbstractController
 
     /**
      * RecommendSearchModelController constructor.
+     *
      * @param CategoryRepository $categoryRepository
      * @param ProductRepository $productRepository
      */
@@ -51,15 +55,15 @@ class RecommendSearchModelController extends AbstractController
      * @param Request     $request
      * @param int         $page_no
      *
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return array
      * @Route("/%eccube_admin_route%/plugin/recommend/search/product", name="plugin_recommend_search_product")
      * @Route("/%eccube_admin_route%/plugin/recommend/search/product/page/{page_no}", requirements={"page_no" = "\d+"}, name="plugin_recommend_search_product_page")
-     * @Template("Recommend/Resource/template/admin/search_product.twig")
+     * @Template("@Recommend/admin/search_product.twig")
      */
     public function searchProduct(Request $request, $page_no = null, Paginator $paginator)
     {
         if (!$request->isXmlHttpRequest()) {
-            return null;
+            return [];
         }
 
         log_debug('Search product start.');
@@ -68,12 +72,12 @@ class RecommendSearchModelController extends AbstractController
         $session = $this->session;
         if ('POST' === $request->getMethod()) {
             $page_no = 1;
-            $searchData = array(
+            $searchData = [
                 'name' => trim($request->get('id')),
-            );
+            ];
 
             if ($categoryId = $request->get('category_id')) {
-                    $searchData['category_id'] = $categoryId;
+                $searchData['category_id'] = $categoryId;
             }
 
             $session->set('eccube.plugin.recommend.product.search', $searchData);
@@ -101,7 +105,7 @@ class RecommendSearchModelController extends AbstractController
             $qb,
             $page_no,
             $pageCount,
-            array('wrap-queries' => true)
+            ['wrap-queries' => true]
         );
 
         /** @var ArrayCollection */
@@ -112,8 +116,8 @@ class RecommendSearchModelController extends AbstractController
             log_debug('Search product not found.');
         }
 
-        return array(
+        return [
             'pagination' => $pagination,
-        );
+        ];
     }
 }
