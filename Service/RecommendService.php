@@ -13,7 +13,6 @@
 
 namespace Plugin\Recommend\Service;
 
-use Eccube\Common\Constant;
 use Plugin\Recommend\Entity\RecommendProduct;
 use Plugin\Recommend\Repository\RecommendProductRepository;
 

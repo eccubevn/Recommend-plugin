@@ -13,7 +13,6 @@
 
 namespace Plugin\Recommend\Repository;
 
-use Eccube\Common\Constant;
 use Eccube\Entity\Master\ProductStatus;
 use Eccube\Repository\AbstractRepository;
 use Plugin\Recommend\Entity\RecommendProduct;
