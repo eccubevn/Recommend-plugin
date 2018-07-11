@@ -97,7 +97,7 @@ class RecommendService
         $Recommend->setComment($data['comment']);
         $Recommend->setProduct($data['Product']);
         $Recommend->setSortno(($rank ? $rank : 0) + 1);
-        $Recommend->setVisible((bool) Constant::ENABLED);
+        $Recommend->setVisible(true);
 
         return $Recommend;
     }

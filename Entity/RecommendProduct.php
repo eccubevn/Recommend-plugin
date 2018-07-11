@@ -158,7 +158,7 @@ class RecommendProduct extends AbstractEntity
     /**
      * Set visible.
      *
-     * @param int $visible
+     * @param bool $visible
      *
      * @return $this
      */
@@ -172,7 +172,7 @@ class RecommendProduct extends AbstractEntity
     /**
      * Get del_flg.
      *
-     * @return int
+     * @return bool
      */
     public function getVisible()
     {

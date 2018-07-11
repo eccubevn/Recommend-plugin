@@ -187,7 +187,7 @@ class RecommendProductRepository extends AbstractRepository
     public function deleteRecommend(RecommendProduct $RecommendProduct)
     {
         // おすすめ商品情報を書き換える
-        $RecommendProduct->setVisible((bool) Constant::DISABLED);
+        $RecommendProduct->setVisible(false);
 
         // おすすめ商品情報を登録する
         return $this->saveRecommend($RecommendProduct);
