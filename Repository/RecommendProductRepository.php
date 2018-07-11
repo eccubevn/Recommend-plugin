@@ -46,7 +46,7 @@ class RecommendProductRepository extends AbstractRepository
     {
         $qb = $this->createQueryBuilder('rp')
             ->innerJoin('rp.Product', 'p');
-        $qb->where('rp.visible = '.(bool) Constant::ENABLED);
+        $qb->where('rp.visible = true');
         $qb->addOrderBy('rp.sort_no', 'DESC');
 
         return $qb->getQuery()->getResult();
@@ -168,7 +168,7 @@ class RecommendProductRepository extends AbstractRepository
     {
         $query = $this->createQueryBuilder('rp')
             ->select('IDENTITY(rp.Product) as id')
-            ->where('rp.visible = '.(bool) Constant::ENABLED)
+            ->where('rp.visible = true')
             ->getQuery();
         $arrReturn = $query->getScalarResult();
 
