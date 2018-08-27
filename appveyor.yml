@@ -70,12 +70,12 @@ install:
 build: off
 
 before_test:
-  - php bin\console doctrine:database:create
-  - php bin\console doctrine:schema:create
-  - php bin\console eccube:fixtures:load
-  - php bin\console eccube:plugin:install --path=%PLUGIN_BASE_DIR%/%PLUGIN_CODE%.tar.gz
+  - php bin/console doctrine:database:create
+  - php bin/console doctrine:schema:create
+  - php bin/console eccube:fixtures:load
+  - php bin/console eccube:plugin:install --path=%PLUGIN_BASE_DIR%/%PLUGIN_CODE%.tar.gz
     # enable plugin
-  - php app/console eccube:plugin:enable --code=%PLUGIN_CODE%
+  - php bin/console eccube:plugin:enable --code=%PLUGIN_CODE%
 
 test_script:
-  - php bin\phpunit app/Plugin/%PLUGIN_CODE%/Tests
+  - php bin/phpunit app/Plugin/%PLUGIN_CODE%/Tests
