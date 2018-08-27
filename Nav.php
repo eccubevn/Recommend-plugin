@@ -30,8 +30,8 @@ class Nav implements EccubeNav
                     'plugin_recommend' => [
                         'name' => 'plugin_recommend.admin.navi',
                         'url' => 'plugin_recommend_list',
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
     }
