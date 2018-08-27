@@ -26,9 +26,12 @@ class Nav implements EccubeNav
     {
         return [
             'content' => [
-                'id' => 'plugin_recommend',
-                'name' => 'plugin_recommend.admin.navi',
-                'url' => 'plugin_recommend_list',
+                'children' => [
+                    'plugin_recommend' => [
+                        'name' => 'plugin_recommend.admin.navi',
+                        'url' => 'plugin_recommend_list',
+                    ]
+                ]
             ],
         ];
     }

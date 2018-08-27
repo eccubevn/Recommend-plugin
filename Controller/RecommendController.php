@@ -19,14 +19,12 @@ use Plugin\Recommend\Entity\RecommendProduct;
 use Plugin\Recommend\Form\Type\RecommendProductType;
 use Plugin\Recommend\Repository\RecommendProductRepository;
 use Plugin\Recommend\Service\RecommendService;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Class RecommendController.
@@ -160,9 +158,7 @@ class RecommendController extends AbstractController
      * @throws \Exception
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     * @Route("/%eccube_admin_route%/plugin/recommend/{id}/delete", name="plugin_recommend_delete", requirements={"id" = "\d+"})
-     * @Method("DELETE")
-     * @ParamConverter("RecommendProduct")
+     * @Route("/%eccube_admin_route%/plugin/recommend/{id}/delete", name="plugin_recommend_delete", requirements={"id" = "\d+"}, methods={"DELETE"})
      */
     public function delete(Request $request, RecommendProduct $RecommendProduct)
     {
