@@ -215,7 +215,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         );
 
         $productList = $crawler->html();
-        $this->assertContains('パーコレーター', $productList);
+        $this->assertContains('彩のジェラートCUBE', $productList);
     }
 
     /**
@@ -224,21 +224,21 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     public function testAjaxSearchUnpublicProduct()
     {
         /** @var Product $Product */
-        $Product = $this->productRepo->findOneBy(['name' => 'ディナーフォーク']);
+        $Product = $this->productRepo->findOneBy(['name' => '彩のジェラートCUBE']);
         $Product->setStatus($this->container->get(ProductStatusRepository::class)->find(ProductStatus::DISPLAY_HIDE));
         $this->entityManager->persist($Product);
         $this->entityManager->flush($Product);
 
         $crawler = $this->client->request(
             'POST',
-            $this->generateUrl('plugin_recommend_search_product', ['id' => 'ディナーフォーク', 'category_id' => '', '_token' => 'dummy']),
+            $this->generateUrl('plugin_recommend_search_product', ['id' => '彩のジェラートCUBE', 'category_id' => '', '_token' => 'dummy']),
             [],
             [],
             ['HTTP_X-Requested-With' => 'XMLHttpRequest']
         );
 
         $productList = $crawler->html();
-        $this->assertContains('ディナーフォーク', $productList);
+        $this->assertContains('彩のジェラートCUBE', $productList);
     }
 
     /**
@@ -248,14 +248,14 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
     {
         $crawler = $this->client->request(
             'POST',
-            $this->generateUrl('plugin_recommend_search_product', ['id' => 'cafe-01', 'category_id' => '', '_token' => 'dummy']),
+            $this->generateUrl('plugin_recommend_search_product', ['id' => '	cube-01', 'category_id' => '', '_token' => 'dummy']),
             [],
             [],
             ['HTTP_X-Requested-With' => 'XMLHttpRequest']
         );
 
         $productList = $crawler->html();
-        $this->assertContains('パーコレーター', $productList);
+        $this->assertContains('彩のジェラートCUBE', $productList);
     }
 
     /**
@@ -272,7 +272,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         );
 
         $productList = $crawler->html();
-        $this->assertContains('パーコレーター', $productList);
+        $this->assertContains('彩のジェラートCUBE', $productList);
     }
 
     /**
@@ -289,7 +289,7 @@ class RecommendAdminControllerTest extends AbstractAdminWebTestCase
         );
 
         $productList = $crawler->html();
-        $this->assertContains('ディナーフォーク', $productList);
+        $this->assertContains('彩のジェラートCUBE', $productList);
     }
 
     /**

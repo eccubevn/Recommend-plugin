@@ -19,7 +19,6 @@ use Eccube\Entity\Block;
 use Eccube\Entity\BlockPosition;
 use Eccube\Entity\Layout;
 use Eccube\Entity\Master\DeviceType;
-use Eccube\Entity\Page;
 use Eccube\Plugin\AbstractPluginManager;
 use Eccube\Repository\BlockPositionRepository;
 use Eccube\Repository\BlockRepository;
@@ -64,20 +63,19 @@ class PluginManager extends AbstractPluginManager
      *
      * @throws \Exception
      */
-    public function uninstall($meta = null, Application $app = null, ContainerInterface $container)
+    public function uninstall(array $meta, ContainerInterface $container)
     {
         // ブロックの削除
         $this->removeDataBlock($container);
     }
 
     /**
-     * @param null $meta
-     * @param Application|null $app
+     * @param null|array $meta
      * @param ContainerInterface $container
      *
      * @throws \Exception
      */
-    public function enable($meta = null, Application $app = null, ContainerInterface $container)
+    public function enable(array $meta = null, ContainerInterface $container)
     {
         $this->copyBlock($container);
         $Block = $container->get(BlockRepository::class)->findOneBy(['file_name' => $this->blockFileName]);
@@ -88,23 +86,19 @@ class PluginManager extends AbstractPluginManager
     }
 
     /**
-     * @param null $meta
-     * @param Application|null $app
+     * @param array|null $meta
      * @param ContainerInterface $container
-     *
-     * @throws \Exception
      */
-    public function disable($meta = null, Application $app = null, ContainerInterface $container)
+    public function disable(array $meta = null, ContainerInterface $container)
     {
         $this->removeBlock($container);
     }
 
     /**
-     * @param null $meta
-     * @param Application|null $app
+     * @param array|null $meta
      * @param ContainerInterface $container
      */
-    public function update($meta = null, Application $app = null, ContainerInterface $container)
+    public function update(array $meta = null, ContainerInterface $container)
     {
         $this->copyBlock($container);
     }
@@ -140,7 +134,7 @@ class PluginManager extends AbstractPluginManager
 
             // BlockPositionの登録
             $blockPos = $container->get(BlockPositionRepository::class)->findOneBy(
-                ['section' => Page::TARGET_ID_MAIN_BOTTOM, 'layout_id' => Layout::DEFAULT_LAYOUT_UNDERLAYER_PAGE],
+                ['section' => Layout::TARGET_ID_MAIN_BOTTOM, 'layout_id' => Layout::DEFAULT_LAYOUT_UNDERLAYER_PAGE],
                 ['block_row' => 'DESC']
             );
 
@@ -157,7 +151,7 @@ class PluginManager extends AbstractPluginManager
 
             $BlockPosition->setLayout($LayoutDefault)
                 ->setLayoutId($LayoutDefault->getId())
-                ->setSection(Page::TARGET_ID_MAIN_BOTTOM)
+                ->setSection(Layout::TARGET_ID_MAIN_BOTTOM)
                 ->setBlock($Block)
                 ->setBlockId($Block->getId());
 
